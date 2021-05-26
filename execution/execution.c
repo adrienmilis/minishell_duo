@@ -200,13 +200,40 @@ int	builtin_env(int pid)
 	return (1);
 }
 
-int	builtin_exit(int pid, int pipes)
+int	is_a_number(char *str)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i] == ' ' || (9 <= str[i] && str[i] <= 13))
+		i++;
+	if (str[i] == '-' || str[i] == '+')
+		i++;
+	while ('0' <= str[i] && str[i] <= '9')
+		i++;
+	while (str[i] == ' ' || (9 <= str[i] && str[i] <= 13))
+		i++;
+	if (str[i])
+		return (0);
+	return (1);
+}
+
+int	builtin_exit(char **arg, int pid, int pipes)
 {
 	if ((pid != 0 && !pipes) || (pid == 0 && pipes))
 	{
-		if (pid != 0)
-			write(1, "exit\n", 5);
-		exit(0);
+		if (*arg)
+		{
+			if (!is_a_number(*arg))
+			{
+				write(2, "bash: exit: ", 12);
+				write(2, *arg, ft_strlen(*arg));
+				write(2, " numeric argument required\n", 27);
+				exit(255);
+			}
+			exit(ft_atoi(*arg));
+		}
+		exit(ft_atoi(mygetenv(myenv, "?")));
 	}
 	return (1);
 }
@@ -226,7 +253,7 @@ int	do_builtin(char **cmd, int pid, int pipes) // faire un strcmp qui decaps
 	else if (!ft_strcmp("env", cmd[0]))
 		return (builtin_env(pid));
 	else if (!ft_strcmp("exit", cmd[0]))
-		return (builtin_exit(pid, pipes));
+		return (builtin_exit(cmd + 1, pid, pipes));
 	else
 		return (0);
 }

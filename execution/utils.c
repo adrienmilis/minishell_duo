@@ -6,7 +6,7 @@
 /*   By: hmesnard <hmesnard@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:09:09 by hmesnard          #+#    #+#             */
-/*   Updated: 2021/05/26 17:21:43 by hmesnard         ###   ########.fr       */
+/*   Updated: 2021/05/26 18:06:07 by hmesnard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,31 @@ int		ft_strcmp(const char *s1, const char *s2)
 		i++;
 	}
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+}
+
+int		ft_atoi(const char *nptr)
+{
+	int					i;
+	unsigned long long	nb;
+	int					sign;
+
+	i = 0;
+	nb = 0;
+	sign = 1;
+	while ((9 <= nptr[i] && nptr[i] <= 13) || nptr[i] == ' ')
+		i++;
+	if (nptr[i] == '+' || nptr[i] == '-')
+		if (nptr[i++] == '-')
+			sign = -1;
+	while ('0' <= nptr[i] && nptr[i] <= '9')
+	{
+		nb = nb * 10 + (nptr[i++] - 48);
+		if (nb > 9223372036854775807)
+		{
+			if (sign == 1)
+				return (-1);
+			return (0);
+		}
+	}
+	return (nb * sign);
 }
