@@ -49,7 +49,7 @@ int	builtin_echo(char **arg, int pid)
 	{
 		while (*arg)
 		{
-			if (option_string && !strcmp_decaps("-", *arg))
+			if (option_string && !ft_strcmp("-", *arg))
 				option_string = 0;
 			else if (option_string && option_n(*arg))
 				nonl = 1;
@@ -213,19 +213,19 @@ int	builtin_exit(int pid, int pipes)
 
 int	do_builtin(char **cmd, int pid, int pipes) // faire un strcmp qui decaps
 {
-	if (!strcmp_decaps("echo", cmd[0]))
+	if (!ft_strcmp("echo", cmd[0]))
 		return (builtin_echo(cmd + 1, pid));
-	else if (!strcmp_decaps("cd", cmd[0]))
+	else if (!ft_strcmp("cd", cmd[0]))
 		return (builtin_cd(cmd + 1, pid, pipes));
-	else if (!strcmp_decaps("pwd", cmd[0]))
+	else if (!ft_strcmp("pwd", cmd[0]))
 		return (builtin_pwd(pid));
-	else if (!strcmp_decaps("export", cmd[0]))
+	else if (!ft_strcmp("export", cmd[0]))
 		return (builtin_export(cmd + 1, pid, pipes));
-	else if (!strcmp_decaps("unset", cmd[0]))
+	else if (!ft_strcmp("unset", cmd[0]))
 		return (builtin_unset(cmd + 1, pid, pipes));
-	else if (!strcmp_decaps("env", cmd[0]))
+	else if (!ft_strcmp("env", cmd[0]))
 		return (builtin_env(pid));
-	else if (!strcmp_decaps("exit", cmd[0]))
+	else if (!ft_strcmp("exit", cmd[0]))
 		return (builtin_exit(pid, pipes));
 	else
 		return (0);
@@ -233,19 +233,19 @@ int	do_builtin(char **cmd, int pid, int pipes) // faire un strcmp qui decaps
 
 int	is_builtin(char **cmd)
 {
-	if (!strcmp_decaps("echo", cmd[0]))
+	if (!ft_strcmp("echo", cmd[0]))
 		return (1);
-	else if (!strcmp_decaps("cd", cmd[0]))
+	else if (!ft_strcmp("cd", cmd[0]))
 		return (1);
-	else if (!strcmp_decaps("pwd", cmd[0]))
+	else if (!ft_strcmp("pwd", cmd[0]))
 		return (1);
-	else if (!strcmp_decaps("export", cmd[0]))
+	else if (!ft_strcmp("export", cmd[0]))
 		return (1);
-	else if (!strcmp_decaps("unset", cmd[0]))
+	else if (!ft_strcmp("unset", cmd[0]))
 		return (1);
-	else if (!strcmp_decaps("env", cmd[0]))
+	else if (!ft_strcmp("env", cmd[0]))
 		return (1);
-	else if (!strcmp_decaps("exit", cmd[0]))
+	else if (!ft_strcmp("exit", cmd[0]))
 		return (1);
 	else
 		return (0);

@@ -6,7 +6,7 @@
 /*   By: hmesnard <hmesnard@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:09:09 by hmesnard          #+#    #+#             */
-/*   Updated: 2021/05/26 11:57:34 by hmesnard         ###   ########.fr       */
+/*   Updated: 2021/05/26 17:21:43 by hmesnard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,21 +60,16 @@ char	*ft_strdup(const char *s)
 	return (res);
 }
 
-int		strcmp_decaps(const char *s1, const char *s2)
+int		ft_strcmp(const char *s1, const char *s2)
 {
 	unsigned int	i;
-	char			s2i;
 
 	i = 0;
-	s2i = s2[0];
-	while (s1[i] && s2i)
+	while (s1[i] && s2[i])
 	{
-		if ('A' <= s2i && s2i <= 'Z')
-			s2i += 32;
-		if (s1[i] != s2i)
-			return ((unsigned char)s1[i] - (unsigned char)s2i);
+		if (s1[i] != s2[i])
+			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 		i++;
-		s2i = s2[i];
 	}
-	return ((unsigned char)s1[i] - (unsigned char)s2i);
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }

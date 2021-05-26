@@ -47,6 +47,6 @@ char		**ft_split(const char *str, char c);
 size_t	ft_strlen(const char *str);
 char	*ft_strjoin(char const *s1, char const *s2, char c);
 char	*ft_strdup(const char *s);
-int		strcmp_decaps(const char *s1, const char *s2);
+int		ft_strcmp(const char *s1, const char *s2);
 
 #endif
