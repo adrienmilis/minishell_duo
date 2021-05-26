@@ -304,14 +304,14 @@ void	launch_executable(char **cmd)
 		if (!PATH_split)
 			return ;
 	}
-	execve(cmd[0], cmd, myenv);
+	execve(cmd[0], cmd, myenv + 1);
 	cmd0 = cmd[0];
 	if (PATH_value && PATH_split[0])
 		cmd[0] = ft_strjoin(PATH_split[0], cmd0, '/');
 	i = 1;
 	if (PATH_value)
 	{
-		while (execve(cmd[0], cmd, myenv) == -1 && PATH_split[i])
+		while (execve(cmd[0], cmd, myenv + 1) == -1 && PATH_split[i])
 		{
 			free(cmd[0]);
 			cmd[0] = ft_strjoin(PATH_split[i++], cmd0, '/');
