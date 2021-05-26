@@ -35,7 +35,8 @@ void	in_simple_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 {
 	if (cmd[p->i + 1] == '\'')
 	{
-		add_argument(ft_strdup(""), p_begin);
+		if (!must_append(p->i, cmd))
+			add_argument(ft_strdup(""), p_begin);
 		p->i += 2;
 		p->in_s_quotes = 0;
 	}

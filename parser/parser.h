@@ -38,8 +38,14 @@ void	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
 int		must_append(int i, char *cmd);
 void	out_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
 
+// double_quotes.c
+void	doubleq_special(t_pars *p, char *cmd, t_pipe_cmd *p_begin, char **buff);
+char	*make_dquotes_arg(t_pars *p, char *cmd, t_pipe_cmd *p_begin);
+char	*arg_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, int r);
+void	in_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd);
+
+
 // parser.c
-char		*arg_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, int r);
 t_pipe_cmd	*parser(char *cmd, int new_command);
 
 // add_arguments.c

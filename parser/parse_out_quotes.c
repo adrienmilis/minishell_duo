@@ -100,7 +100,7 @@ int	must_append(int i, char *cmd)
 		return (0);
 	if (i >= 2 && is_unesc_double(&cmd[i - 1], i - 1) && is_unesc_double(&cmd[i - 2], i - 2))
 		return (0);*/
-	if (i >= 2)
+	/*if (i >= 2)
 	{
 		if (is_unesc_simple(&cmd[i - 1], i - 1))
 		{
@@ -120,7 +120,7 @@ int	must_append(int i, char *cmd)
 				return (0);
 			return (1);
 		}
-	}
+	}*/
 	if (i != 0 && !is_r_space(&cmd[i - 1], i - 1) && !is_r_resvd_char(&cmd[i - 1], i - 1, 0))
 		return (1);
 	return (0);
