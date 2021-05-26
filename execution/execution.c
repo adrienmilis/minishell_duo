@@ -70,7 +70,7 @@ int	builtin_echo(char **arg, int pid)
 
 int	builtin_cd(char **arg, int pid, int pipes)
 {
-	if (*arg)
+	if (*arg && arg[0] != '\0')
 	{
 		if ((pid != 0 && !pipes) || (pid == 0 && pipes))
 		{
