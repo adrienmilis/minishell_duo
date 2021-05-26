@@ -226,9 +226,9 @@ int	builtin_exit(char **arg, int pid, int pipes)
 		{
 			if (!is_a_number(*arg))
 			{
-				write(2, "bash: exit: ", 12);
+				write(2, "minishell: exit: ", 17);
 				write(2, *arg, ft_strlen(*arg));
-				write(2, " numeric argument required\n", 27);
+				write(2, ": numeric argument required\n", 28);
 				exit(255);
 			}
 			exit(ft_atoi(*arg));
