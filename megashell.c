@@ -49,7 +49,7 @@ int	input(char *buffer, char **path, char **env, int c, char *argv2)
 			pipe_cmd = parser(argv2, 0);
 		//printf("4\n");
 		}
-		exit(0);
+		exit(ft_atoi(mygetenv(myenv, "?")));
 	}
 	ret = read(0, &buf, 3);
 	if (ret == -1)

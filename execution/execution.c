@@ -231,10 +231,19 @@ int	builtin_exit(char **arg, int pid, int pipes)
 				write(2, ": numeric argument required\n", 28);
 				exit(255);
 			}
-			exit(ft_atoi(*arg));
+			else
+			{
+				if (*(arg + 1))
+					write(2, "minishell: exit: too many arguments\n", 36);
+				if (!*(arg + 1))
+					exit(ft_atoi(*arg));
+			}
 		}
-		exit(ft_atoi(mygetenv(myenv, "?")));
+		else
+			exit(ft_atoi(mygetenv(myenv, "?")));
 	}
+	if (pid == 0 && *arg && is_a_number(*arg) && *(arg + 1))
+		exit(1);
 	return (1);
 }
 
