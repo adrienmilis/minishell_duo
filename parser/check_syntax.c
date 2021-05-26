@@ -69,7 +69,7 @@ int	pipes_valid(char *cmd)
 	return (1);
 }
 
-int	quotes_are_closed(char *cmd)
+void	are_quotes_closed(char *cmd)
 {
 	int		i;
 	t_pars	p;
@@ -78,15 +78,15 @@ int	quotes_are_closed(char *cmd)
 	init_pars_struct(&p, 1, 0);
 	while (cmd[++i])
 		set_quotes(i, cmd, &p);
-	if (p.in_s_quotes != 0 || p.in_d_quotes != 0)
-		return (0);
-	return (1);
+	if (p.in_s_quotes != 0)
+		error_exit("unexpected EOF while looking for matching `''", NULL);
+	if (p.in_d_quotes != 0)
+		error_exit("unexpected EOF while looking for matching `\"'", NULL);
 }
 
 void	check_syntax(char *cmd)
 {
-	if (!quotes_are_closed(cmd))
-		error_exit("command ended while looking for matching quote", NULL);
+	are_quotes_closed(cmd);
 	if (!semicolons_valid(cmd))
 		error_exit("syntax error near unexpected token `;'", NULL);
 	if (!pipes_valid(cmd))

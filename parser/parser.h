@@ -64,7 +64,7 @@ void		reset_pars_struct(t_pars *p);
 void 	set_quotes(int i, char *cmd, t_pars *p);
 int		semicolons_valid(char *cmd);
 int		pipes_valid(char *cmd);
-int		quotes_are_closed(char *cmd);
+void	are_quotes_closed(char *cmd);
 void	check_syntax(char *cmd);
 
 // check_chars.c
