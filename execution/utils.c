@@ -6,7 +6,7 @@
 /*   By: hmesnard <hmesnard@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:09:09 by hmesnard          #+#    #+#             */
-/*   Updated: 2021/05/26 18:06:07 by hmesnard         ###   ########.fr       */
+/*   Updated: 2021/05/27 11:19:14 by hmesnard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,4 +99,17 @@ int		ft_atoi(const char *nptr)
 		}
 	}
 	return (nb * sign);
+}
+
+char	*ft_strchr(const char *s, int c)
+{
+	int		i;
+
+	i = -1;
+	while (s[++i])
+		if (s[i] == c)
+			return ((char*)s + i);
+	if (s[i] == c)
+		return ((char*)s + i);
+	return (NULL);
 }

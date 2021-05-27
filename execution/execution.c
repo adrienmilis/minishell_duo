@@ -287,6 +287,20 @@ int	is_builtin(char **cmd)
 		return (0);
 }
 
+void	directory(char *cmd)
+{
+	struct stat	buf;
+
+	stat(cmd, &buf);
+	if (S_ISDIR(buf.st_mode) && ft_strchr(cmd, '/'))
+	{
+		write(2, "minishell: ", 11);
+		write(2, cmd, ft_strlen(cmd));
+		write(2, ": is a directory\n", 17);
+		exit(126);
+	}
+}
+
 void	launch_executable(char **cmd)
 {
 	int		i;
@@ -317,9 +331,10 @@ void	launch_executable(char **cmd)
 			cmd[0] = ft_strjoin(PATH_split[i++], cmd0, '/');
 		}
 	}
-	write(1, "minishell: ", 11);
-	write(1, cmd0, ft_strlen(cmd0));
-	write(1, ": command not found\n", 20);
+	directory(cmd0);
+	write(2, "minishell: ", 11);
+	write(2, cmd0, ft_strlen(cmd0));
+	write(2, ": command not found\n", 20);
 	exit(127);
 }
 
