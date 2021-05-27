@@ -6,7 +6,7 @@
 /*   By: hmesnard <hmesnard@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:09:09 by hmesnard          #+#    #+#             */
-/*   Updated: 2021/05/27 12:27:17 by hmesnard         ###   ########.fr       */
+/*   Updated: 2021/05/27 15:04:57 by hmesnard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,4 +149,20 @@ void	ft_putnbr_fd(int n, int fd)
 	if (posn >= 10)
 		ft_putnbr_fd(posn / 10, fd);
 	ft_putchar_fd(posn % 10 + 48, fd);
+}
+
+int		ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	unsigned int	i;
+
+	i = 0;
+	if (n < 1)
+		return (0);
+	while (s1[i] && s2[i] && i < n - 1)
+	{
+		if (s1[i] != s2[i])
+			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+		i++;
+	}
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
