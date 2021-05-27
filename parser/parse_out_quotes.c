@@ -94,39 +94,19 @@ void	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 	}
 }
 
-int	must_append(int i, char *cmd)
+int	must_append(int i, char *cmd, t_pars *p)
 {
-	/*if (i >= 2 && is_unesc_simple(&cmd[i - 1], i - 1) && is_unesc_simple(&cmd[i - 2], i - 2))
-		return (0);
-	if (i >= 2 && is_unesc_double(&cmd[i - 1], i - 1) && is_unesc_double(&cmd[i - 2], i - 2))
-		return (0);*/
-	/*if (i >= 2)
+	if (p->prev_var_w_space == 1)
 	{
-		if (is_unesc_simple(&cmd[i - 1], i - 1))
-		{
-			i--;
-			while (is_unesc_simple(&cmd[i], i))
-				i--;
-			if (is_r_space(&cmd[i], i))
-				return (0);
-			return (1);
-		}
-		else if (is_unesc_double(&cmd[i - 1], i - 1))
-		{
-			i--;
-			while (is_unesc_double(&cmd[i], i))
-				i--;
-			if (is_r_space(&cmd[i], i))
-				return (0);
-			return (1);
-		}
-	}*/
+		p->prev_var_w_space = 0;
+		return (0);
+	}
 	if (i != 0 && !is_r_space(&cmd[i - 1], i - 1) && !is_r_resvd_char(&cmd[i - 1], i - 1, 0))
 		return (1);
 	return (0);
 }
 
-char	*make_word(char	*word, t_pipe_cmd *p_begin)
+char	*make_word(char	*word, t_pipe_cmd *p_begin, t_pars *p)
 {
 	char		*new_word;
 	int			j;
@@ -139,6 +119,8 @@ char	*make_word(char	*word, t_pipe_cmd *p_begin)
 		i++;
 	if (j == i)
 	{
+		if (is_space(word[i - 1]))
+			p->prev_var_w_space = 1;
 		i = 0;
 		return (NULL);
 	}
@@ -148,13 +130,13 @@ char	*make_word(char	*word, t_pipe_cmd *p_begin)
 	return (new_word);
 }
 
-void	argument_w_spaces(char *word, int append, t_pipe_cmd *p_begin)
+void	argument_w_spaces(char *word, int append, t_pipe_cmd *p_begin, t_pars *p)
 {
 	char	*new_word;
 	int		i;
 
 	i = 0;
-	new_word = make_word(word, p_begin);
+	new_word = make_word(word, p_begin, p);
 	while (new_word)
 	{
 		if (append && !is_space(word[0]))
@@ -165,7 +147,7 @@ void	argument_w_spaces(char *word, int append, t_pipe_cmd *p_begin)
 		}
 		else
 			add_argument(new_word, p_begin);
-		new_word = make_word(word, p_begin);
+		new_word = make_word(word, p_begin, p);
 	}
 }
 
@@ -184,13 +166,13 @@ void	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 		p->in_s_quotes = 1;
 	else if (cmd[p->i] == '"')
 		p->in_d_quotes = 1;
-	else if (must_append(p->i, cmd)/*p->i != 0 && !is_r_space(&cmd[p->i - 1], p->i - 1) && !is_r_resvd_char(&cmd[p->i - 1], p->i - 1, 0)*/)
+	else if (must_append(p->i, cmd, p)/*p->i != 0 && !is_r_space(&cmd[p->i - 1], p->i - 1) && !is_r_resvd_char(&cmd[p->i - 1], p->i - 1, 0)*/)
 	{
 		word = get_next_word(cmd, p, p_begin);
 		if (word)
 		{
 		if (real_space_in_word(word))
-			argument_w_spaces(word, 1, p_begin);
+			argument_w_spaces(word, 1, p_begin, p);
 		else
 			if (!append_arg(ft_lstlast(p_begin), word, NULL))
 				error_exit("malloc error", p_begin);
@@ -201,7 +183,7 @@ void	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 		word = get_next_word(cmd, p, p_begin);
 		if (word)
 		{if (real_space_in_word(word))
-			argument_w_spaces(word, 0, p_begin);
+			argument_w_spaces(word, 0, p_begin, p);
 		else
 			add_argument(word, p_begin);
 		}

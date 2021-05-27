@@ -23,6 +23,7 @@ typedef struct s_pars
 	int	in_d_quotes;
 	int	semicolon;
 	int	i;
+	int	prev_var_w_space;
 }				t_pars;
 
 // errors.c
@@ -35,7 +36,7 @@ char 	*get_redir_word(char *cmd, t_pars *p, t_pipe_cmd *p_begin);
 void	real_sign2(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, char sign);
 void	real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
 void	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
-int		must_append(int i, char *cmd);
+int		must_append(int i, char *cmd, t_pars *p);
 void	out_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
 
 // double_quotes.c

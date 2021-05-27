@@ -61,7 +61,7 @@ char	*arg_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, int r)
 	new_arg = make_dquotes_arg(p, cmd, p_begin);
 	if (r)
 		return (new_arg);
-	if (must_append(beg, cmd)/*beg != 0 && !is_r_space(&cmd[beg - 1], beg - 1)*/)
+	if (must_append(beg, cmd, p)/*beg != 0 && !is_r_space(&cmd[beg - 1], beg - 1)*/)
 	{
 		if (!(append_arg(ft_lstlast(p_begin), new_arg, NULL)))
 		{
@@ -80,7 +80,7 @@ void	in_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 {
 	if (cmd[p->i + 1] == '"')
 	{
-		if (!must_append(p->i, cmd))
+		if (!must_append(p->i, cmd, p))
 			add_argument(ft_strdup(""), p_begin);
 		p->i += 2;
 		p->in_d_quotes = 0;
