@@ -405,7 +405,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd)
 	{
 		status = WEXITSTATUS(status);
 		free(myenv[0]);
-		myenv[0] = itoa_env_var(status);
+		myenv[0] = itoa_env_var("?=", status);
 	}
 	close(pipefd[1][0]);
 	close(pipefd[1][1]);

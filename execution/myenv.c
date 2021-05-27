@@ -315,7 +315,7 @@ static int	nblen(unsigned int n)
 	return (1 + nblen(n / 10));
 }
 
-char		*itoa_env_var(int n)
+char		*itoa_env_var(char *prefix, int n)
 {
 	char			*res;
 	int				len;
@@ -324,21 +324,20 @@ char		*itoa_env_var(int n)
 	posn = n;
 	if (n < 0)
 		posn = -n;
-	len = nblen(posn) + 2;
+	len = nblen(posn) + ft_strlen(prefix);
 	if (n < 0)
 		len++;
 	res = malloc((len + 1) * sizeof(char));
 	if (!res)
 		return (NULL);
 	res[len] = '\0';
-	while (--len >= 2)
+	while ((unsigned int)--len >= ft_strlen(prefix))
 	{
 		res[len] = posn % 10 + 48;
 		posn /= 10;
 	}
 	if (n < 0)
-		res[2] = '-';
-	res[0] = '?';
-	res[1] = '=';
+		res[ft_strlen(prefix)] = '-';
+	ft_memmove(res, prefix, ft_strlen(prefix));
 	return (res);
 }

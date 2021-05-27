@@ -114,7 +114,32 @@ int	init_termcap()
 	return (0);
 }
 
-char	**new_env(char **env);
+void	shlvl()
+{
+	int		shlvl;
+	size_t	i;
+
+	if (!var_is_in_env(myenv, "SHLVL"))
+		myenv = add_env_var_value(myenv, "SHLVL", "1");
+	else
+	{
+		i = 0;
+		while (strcmp_env(myenv[i], "SHLVL"))
+			i++;
+		shlvl = ft_atoi(mygetenv(myenv, "SHLVL")) + 1;
+		if (shlvl > 1000)
+		{
+			write(2, "minishell: warning: shell level (", 33);
+			ft_putnbr_fd(shlvl, 2);
+			write(2, ") too high, resetting to 1\n", 27);
+			shlvl = 1;
+		}
+		else if (shlvl < 0)
+			shlvl = 0;
+		free(myenv[i]);
+		myenv[i] = itoa_env_var("SHLVL=", shlvl);
+	}
+}
 
 int	main(int argc, char **argv, char **env)
 {
@@ -127,6 +152,7 @@ int	main(int argc, char **argv, char **env)
 		myenv = add_env_var_value(myenv, "PWD", getcwd(NULL, 0));
 	if (!var_is_in_env(myenv, "OLDPWD"))
 		myenv = add_env_var_value(myenv, "OLDPWD", "");
+	shlvl();
 
 	buffer = (char *)calloc(sizeof(char), buf_size);
 	if (buffer == NULL) {

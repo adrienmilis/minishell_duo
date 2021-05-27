@@ -6,7 +6,7 @@
 /*   By: hmesnard <hmesnard@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:09:09 by hmesnard          #+#    #+#             */
-/*   Updated: 2021/05/27 11:19:14 by hmesnard         ###   ########.fr       */
+/*   Updated: 2021/05/27 12:27:17 by hmesnard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,4 +112,41 @@ char	*ft_strchr(const char *s, int c)
 	if (s[i] == c)
 		return ((char*)s + i);
 	return (NULL);
+}
+
+void	*ft_memmove(void *dest, const void *src, size_t n)
+{
+	unsigned int	i;
+
+	i = 0;
+	if ((dest || src) && (dest != src))
+	{
+		if (src < dest)
+			while (n--)
+				*((char*)dest + n) = *((char*)src + n);
+		else
+			while (i < n)
+			{
+				*((char*)dest + i) = *((char*)src + i);
+				i++;
+			}
+	}
+	return (dest);
+}
+
+static void	ft_putchar_fd(char c, int fd)
+{
+	write(fd, &c, 1);
+}
+
+void	ft_putnbr_fd(int n, int fd)
+{
+	unsigned int	posn;
+
+	posn = (n < 0) ? -n : n;
+	if (n < 0)
+		ft_putchar_fd('-', fd);
+	if (posn >= 10)
+		ft_putnbr_fd(posn / 10, fd);
+	ft_putchar_fd(posn % 10 + 48, fd);
 }

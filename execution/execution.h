@@ -42,7 +42,7 @@ int		var_has_value(char *var);
 int		modif_env_var(char **env, char *var);
 int		modif_env_var_value(char **env, char *varname, char *varvalue);
 char	*mygetenv(char **env, char *var);
-char		*itoa_env_var(int n);
+char		*itoa_env_var(char *prefix, int n);
 
 char		**ft_split(const char *str, char c);
 
@@ -52,5 +52,7 @@ char	*ft_strdup(const char *s);
 int		ft_strcmp(const char *s1, const char *s2);
 int		ft_atoi(const char *nptr);
 char	*ft_strchr(const char *s, int c);
+void	*ft_memmove(void *dest, const void *src, size_t n);
+void	ft_putnbr_fd(int n, int fd);
 
 #endif
