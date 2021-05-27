@@ -5,4 +5,4 @@ all:
 	make -C execution
 	gcc -Wall -Wextra -Werror -lncurses parser/parser.a execution/execution.a megashell.c -o $(NAME)
 	make clean -C parser
-	make clean -C execution
+	make fclean -C execution
