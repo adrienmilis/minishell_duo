@@ -150,8 +150,8 @@ int	main(int argc, char **argv, char **env)
 	myenv = new_env(env);
 	if (!var_is_in_env(myenv, "PWD"))
 		myenv = add_env_var_value(myenv, "PWD", getcwd(NULL, 0));
-	if (!var_is_in_env(myenv, "OLDPWD"))
-		myenv = add_env_var_value(myenv, "OLDPWD", "");
+	/*if (!var_is_in_env(myenv, "OLDPWD"))
+		myenv = add_env_var_value(myenv, "OLDPWD", "");*/
 	shlvl();
 
 	buffer = (char *)calloc(sizeof(char), buf_size);
