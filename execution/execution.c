@@ -78,7 +78,10 @@ int	builtin_cd(char **arg, int pid, int pipes)
 			{
 				write(2, "minishell: cd: ", 15);
 				write(2, *arg, ft_strlen(*arg));
-				write(2, ": No such file or directory\n", 28);
+				if (errno == ENOENT)
+					write(2, ": No such file or directory\n", 28);
+				if (errno == EACCES)
+					write(2, ": Permission denied\n", 20);
 			}
 			else
 			{
@@ -86,6 +89,8 @@ int	builtin_cd(char **arg, int pid, int pipes)
 				modif_env_var_value(myenv, "PWD", getcwd(NULL, 0));
 			}
 		}
+		else if (pid == 0 && chdir(*arg) < 0)
+			exit(1);
 	}
 	else
 		modif_env_var_value(myenv, "OLDPWD", mygetenv(myenv, "PWD"));
@@ -242,7 +247,7 @@ int	builtin_exit(char **arg, int pid, int pipes)
 		else
 			exit(ft_atoi(mygetenv(myenv, "?")));
 	}
-	if (pid == 0 && *arg && is_a_number(*arg) && *(arg + 1))
+	else if (pid == 0 && *arg && is_a_number(*arg) && *(arg + 1))
 		exit(1);
 	return (1);
 }
