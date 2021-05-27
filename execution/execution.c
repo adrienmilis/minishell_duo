@@ -211,6 +211,10 @@ int	builtin_unset(char **arg, int pid, int pipes)
 			arg++;
 		}
 	}
+	else if (pid == 0)
+		while (*(arg++))
+			if (!valid_env_name(*(arg - 1)))
+				exit(1);
 	return (1);
 }
 
