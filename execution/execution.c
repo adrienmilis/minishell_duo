@@ -118,6 +118,20 @@ int	builtin_pwd(int pid)
 	return (1);
 }
 
+void	export_print_env(char *var)
+{
+	size_t	i;
+
+	i = 0;
+	while (var[i])
+	{
+		if (var[i] == '$' || var[i] == '\"' || var[i] == '\\')
+			write(1, "\\", 1);
+		write(1, var + i, 1);
+		i++;
+	}
+}
+
 int	builtin_export(char **arg, int pid, int pipes)
 {
 	char	**copy_myenv;
@@ -139,7 +153,7 @@ int	builtin_export(char **arg, int pid, int pipes)
 			if (var_has_value(copy_myenv[i]))
 			{
 				write(1, "=\"", 2);
-				write(1, copy_myenv[i] + env_var_len + 1, ft_strlen(copy_myenv[i] + env_var_len + 1));
+				export_print_env(mygetenv(myenv, copy_myenv[i]));
 				write(1, "\"", 1);
 			}
 			write(1, "\n", 1);
