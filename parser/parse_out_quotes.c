@@ -126,16 +126,59 @@ int	must_append(int i, char *cmd)
 	return (0);
 }
 
-void	out_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
+char	*make_word(char	*word, t_pipe_cmd *p_begin)
+{
+	char		*new_word;
+	int			j;
+	static int	i;
+
+	while (is_space(word[i]) && word[i])	// !!!! tester une variable avec que des espaces ???
+		i++;
+	j = i;
+	while (!is_r_space(&word[i], i) && word[i])
+		i++;
+	if (j == i)
+	{
+		i = 0;
+		return (NULL);
+	}
+	new_word = ft_strdup_len(word + j, i - j);
+	if (!new_word)
+		error_exit("malloc error", p_begin);
+	return (new_word);
+}
+
+void	argument_w_spaces(char *word, int append, t_pipe_cmd *p_begin)
+{
+	char	*new_word;
+	int		i;
+
+	i = 0;
+	new_word = make_word(word, p_begin);
+	while (new_word)
+	{
+		if (append && !is_space(word[0]))
+		{
+			if (!(append_arg(ft_lstlast(p_begin), new_word, NULL)))
+				error_exit("malloc error", p_begin);
+			append = 0;
+		}
+		else
+			add_argument(new_word, p_begin);
+		new_word = make_word(word, p_begin);
+	}
+}
+
+void	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 {
 	char	*word;
 
 	if (is_r_resvd_char(&cmd[p->i], p->i, 0))
-		reserved_chars(p, p_cmd_start, cmd);
+		reserved_chars(p, p_begin, cmd);
 	else if (is_r_space(&cmd[p->i], p->i))
 	{
 		p->i += 1;
-		out_quotes(p, p_cmd_start, cmd);
+		out_quotes(p, p_begin, cmd);
 	}
 	else if (cmd[p->i] == '\'')
 		p->in_s_quotes = 1;
@@ -143,14 +186,24 @@ void	out_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 		p->in_d_quotes = 1;
 	else if (must_append(p->i, cmd)/*p->i != 0 && !is_r_space(&cmd[p->i - 1], p->i - 1) && !is_r_resvd_char(&cmd[p->i - 1], p->i - 1, 0)*/)
 	{
-		word = get_next_word(cmd, p, p_cmd_start);
+		word = get_next_word(cmd, p, p_begin);
 		if (word)
-			if (!append_arg(ft_lstlast(p_cmd_start), word, NULL))
-				error_exit("malloc error", p_cmd_start);
+		{
+		if (real_space_in_word(word))
+			argument_w_spaces(word, 1, p_begin);
+		else
+			if (!append_arg(ft_lstlast(p_begin), word, NULL))
+				error_exit("malloc error", p_begin);
+		}
 	}
 	else	// on est au debut d'un mot et pas de quote avant
 	{
-		word = get_next_word(cmd, p, p_cmd_start);
-		add_argument(word, p_cmd_start);
+		word = get_next_word(cmd, p, p_begin);
+		if (word)
+		{if (real_space_in_word(word))
+			argument_w_spaces(word, 0, p_begin);
+		else
+			add_argument(word, p_begin);
+		}
 	}
 }

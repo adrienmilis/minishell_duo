@@ -50,7 +50,7 @@ t_pipe_cmd	*parser(char *cmd, int new_command);
 
 // add_arguments.c
 void		add_argument2(char **new_args, int i, char *word, t_pipe_cmd *last);
-int			append_arg(t_pipe_cmd *lasts, char *word, char *tmp);
+int			append_arg(t_pipe_cmd *last, char *word, char *tmp);
 void		add_argument(char *word, t_pipe_cmd *p_begin);
 char		*copy_next_word(char *cmd, t_pars *p, int word_size, t_pipe_cmd *p_cmd_start);
 char		*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start);
@@ -84,6 +84,7 @@ int		valid_var_char(char c);
 // check_chars3.c
 int		is_unesc_simple(char *c, int i);
 int		is_unesc_double(char *c, int i);
+int		real_space_in_word(char	*word);
 
 // linked_list.c
 t_pipe_cmd	*ft_lstlast(t_pipe_cmd *begin_list);
