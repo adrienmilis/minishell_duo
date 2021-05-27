@@ -205,7 +205,7 @@ int	builtin_unset(char **arg, int pid, int pipes)
 			else
 			{
 				write(2, "minishell: unset: `", 19);
-				write(2, arg, ft_strlen(*arg));
+				write(2, *arg, ft_strlen(*arg));
 				write(2, "\': not a valid identifier\n", 26);
 			}
 			arg++;
