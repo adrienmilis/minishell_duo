@@ -103,6 +103,7 @@ char	*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start)	// renvoie NU
 	if (cmd[p->i] == '$')
 	{
 		word = get_variable(p, cmd, p_cmd_start);
+		p->word_from_variable = 1;
 		return (word);
 	}
 	j = p->i;

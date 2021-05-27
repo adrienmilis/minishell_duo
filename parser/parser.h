@@ -24,6 +24,7 @@ typedef struct s_pars
 	int	semicolon;
 	int	i;
 	int	prev_var_w_space;
+	int	word_from_variable;
 }				t_pars;
 
 // errors.c

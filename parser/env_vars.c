@@ -67,9 +67,9 @@ char	*valid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_cmd_start)
 		error_exit("malloc error", p_cmd_start);
 	while (myenv[j] && strcmp_env(var_name, myenv[j]))
 		j++;
+	free(var_name);
 	if (myenv[j] == 0)
 		return (NULL);
-	free(var_name);
 	var_value = get_env_var(j);
 	if (!var_value)
 		error_exit("malloc error", p_cmd_start);

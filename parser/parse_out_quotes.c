@@ -169,23 +169,28 @@ void	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 	else if (must_append(p->i, cmd, p)/*p->i != 0 && !is_r_space(&cmd[p->i - 1], p->i - 1) && !is_r_resvd_char(&cmd[p->i - 1], p->i - 1, 0)*/)
 	{
 		word = get_next_word(cmd, p, p_begin);
+		// printf("VAR : %d\n", p->word_from_variable);
 		if (word)
 		{
-		if (real_space_in_word(word))
-			argument_w_spaces(word, 1, p_begin, p);
-		else
-			if (!append_arg(ft_lstlast(p_begin), word, NULL))
-				error_exit("malloc error", p_begin);
+			if (p->word_from_variable && real_space_in_word(word))
+				argument_w_spaces(word, 1, p_begin, p);
+			else
+				if (!append_arg(ft_lstlast(p_begin), word, NULL))
+					error_exit("malloc error", p_begin);
 		}
+		p->word_from_variable = 0;
 	}
 	else	// on est au debut d'un mot et pas de quote avant
 	{
 		word = get_next_word(cmd, p, p_begin);
+		// printf("VAR : %d\n", p->word_from_variable);
 		if (word)
-		{if (real_space_in_word(word))
-			argument_w_spaces(word, 0, p_begin, p);
-		else
-			add_argument(word, p_begin);
+		{
+			if (p->word_from_variable && real_space_in_word(word))
+				argument_w_spaces(word, 0, p_begin, p);
+			else
+				add_argument(word, p_begin);
 		}
+		p->word_from_variable = 0; // ici ?
 	}
 }
