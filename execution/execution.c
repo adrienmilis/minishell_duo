@@ -223,8 +223,11 @@ int	builtin_env(int pid)
 		i = 1;
 		while (myenv[i])
 		{
-			write(1, myenv[i], ft_strlen(myenv[i]));
-			write(1, "\n", 1);
+			if (var_has_value(myenv[i]))
+			{
+				write(1, myenv[i], ft_strlen(myenv[i]));
+				write(1, "\n", 1);
+			}
 			i++;
 		}
 	}

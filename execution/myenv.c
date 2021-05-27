@@ -6,13 +6,10 @@ size_t	strlen_env_var(char *var)
 
 	res = 0;
 	if (!var)
-		return (-1);
+		return (0);
 	while (var[res] && var[res] != '=')
 		res++;
-	if (var[res])
-		return (res);
-	else
-		return (-1);
+	return (res);
 }
 
 int		strcmp_env(const char *s1, const char *s2)
