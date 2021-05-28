@@ -33,10 +33,6 @@ char 	*unvalid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
 
 	if (is_space(cmd[p->i]) || cmd[p->i] == 0)
 		return (dup_dollar(p_begin));
-	/*if (!d_quo)
-		tmp_word = get_next_word(cmd, p, p_begin);
-	else
-		tmp_word = gnw_double_quotes(p, cmd, p_begin);*/
 	tmp_word = get_redir_word(cmd, p, p_begin);
 	word = malloc(sizeof(char) * (ft_strlen(tmp_word) + 2));
 	if (!word)
