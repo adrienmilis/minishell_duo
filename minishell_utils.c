@@ -117,8 +117,8 @@ void	del_char_buffer(char **buffer)
 		new_buffer[i - 1] = 0;
 		tmp = old_buf;
 		*buffer = new_buffer;
-		if (tmp)
-			free(tmp);
+		// if (tmp)
+		// 	free(tmp);
 		tputs(tgetstr("le", NULL), 1, ft_putchar);
 		tputs(tgetstr("dc", NULL), 1, ft_putchar);
 	}
