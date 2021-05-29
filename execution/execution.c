@@ -353,7 +353,15 @@ int	is_builtin(char **cmd)
 		return (0);
 }
 
-void	directory(char *cmd)
+int	no_permission(char *cmd)
+{
+	write(2, "minishell: ", 11);
+	write(2, cmd, ft_strlen(cmd));
+	write(2, ": Permission denied\n", 20);
+	exit(126);
+}
+
+void	stat_check(char *cmd)
 {
 	struct stat	buf;
 
@@ -364,6 +372,13 @@ void	directory(char *cmd)
 		write(2, cmd, ft_strlen(cmd));
 		write(2, ": is a directory\n", 17);
 		exit(126);
+	}
+	else if (S_ISREG(buf.st_mode) && ft_strchr(cmd, '/'))
+	{
+		if (!(buf.st_mode & S_IRUSR) || !(buf.st_mode & S_IXUSR))
+			no_permission(cmd);
+		else
+			exit(0);
 	}
 }
 
@@ -385,6 +400,8 @@ void	launch_executable(char **cmd)
 			return ;
 	}
 	execve(cmd[0], cmd, myenv + 1);
+	if (errno == EACCES && ft_strchr(cmd[0], '/'))
+		stat_check(cmd[0]);
 	cmd0 = cmd[0];
 	if (PATH_value && PATH_split[0])
 		cmd[0] = ft_strjoin(PATH_split[0], cmd0, '/');
@@ -393,14 +410,19 @@ void	launch_executable(char **cmd)
 	{
 		while (execve(cmd[0], cmd, myenv + 1) == -1 && PATH_split[i])
 		{
+			if (errno == EACCES && ft_strchr(cmd0, '/'))
+				no_permission(cmd0);
 			free(cmd[0]);
 			cmd[0] = ft_strjoin(PATH_split[i++], cmd0, '/');
 		}
 	}
-	directory(cmd0);
+	stat_check(cmd0);
 	write(2, "minishell: ", 11);
 	write(2, cmd0, ft_strlen(cmd0));
-	write(2, ": command not found\n", 20);
+	if (!ft_strchr(cmd0, '/'))
+		write(2, ": command not found\n", 20);
+	else
+		write(2, ": No such file or directory\n", 28);
 	exit(127);
 }
 
@@ -419,6 +441,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd)
 		pipes = 1;
 	while (pipe_cmd)
 	{
+		//printf("----\n%s\n----\n", pipe_cmd->cmd[0]);
 		pipefd[0][0] = pipefd[1][0];
 		pipefd[0][1] = pipefd[1][1];
 		pipe(pipefd[1]);
