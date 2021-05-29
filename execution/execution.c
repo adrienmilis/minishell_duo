@@ -415,6 +415,8 @@ void	launch_executable(char **cmd)
 			free(cmd[0]);
 			cmd[0] = ft_strjoin(PATH_split[i++], cmd0, '/');
 		}
+		if (errno == EACCES && ft_strchr(cmd[0], '/'))
+			no_permission(cmd[0]);
 	}
 	stat_check(cmd0);
 	write(2, "minishell: ", 11);
