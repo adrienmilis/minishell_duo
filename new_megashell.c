@@ -171,7 +171,7 @@ int	main2(char *buffer, t_command *begin_list, int c, char *argv2)
 		s_termios.c_lflag &= ~(ECHO);
 		if (tcsetattr(0, 0, &s_termios) == -1)
 			return (-1);
-		write(1, "megashell> ", 11);
+		// write(1, "megashell> ", 11);
 		while (ret > 0)
 			ret = read_input(&buffer, &begin_list, c, argv2);
 		if (tcsetattr(0, 0, &s_termios_backup) == -1)
