@@ -7,17 +7,20 @@ char 	*get_redir_word(char *cmd, t_pars *p, t_pipe_cmd *p_begin)
 	while (is_space(cmd[p->i]))
 		p->i += 1;
 	if (cmd[p->i] == '\'')
-	{
 		word = arg_simple_quotes(p, p_begin, cmd, 1);
-		p->i += 1;
-	}
 	else if (cmd[p->i] == '"')
-	{
 		word = arg_double_quotes(p, p_begin, cmd, 1);
-		p->i += 1;
-	}
 	else
 		word = get_next_word(cmd, p, p_begin);
+	while (!is_r_space(&cmd[p->i], p->i) && !is_r_resvd_char(&cmd[p->i], p->i, 0) && cmd[p->i])
+	{
+		if (cmd[p->i] == '\'')
+			word = ft_strjoin_w_ns(word, arg_simple_quotes(p, p_begin, cmd, 1));
+		else if (cmd[p->i] == '"')
+			word = ft_strjoin_w_ns(word, arg_double_quotes(p, p_begin, cmd, 1));
+		else
+			word = ft_strjoin_w_ns(word, get_next_word(cmd, p, p_begin));
+	}
 	return (word);
 }
 
