@@ -9,13 +9,14 @@ int	ft_isprint(int c)
 
 void	ft_putstr(char *str)
 {
-	int	i;
+	int i;
+	int str_len;
 
-	if (!str)
+	if (str == NULL)
 		return ;
 	i = 0;
-	while (str[i])
-		ft_putchar(str[i++]);
+	str_len = ft_strlen(str);
+	write(1, str, str_len);
 }
 
 int	init_termcap()
@@ -81,18 +82,7 @@ char	*make_buffer(char *buf, char c)
 	return (buf_cpy);
 }
 
-void	c_option(char *argv2)
-{
-	t_pipe_cmd	*pipe_cmd;
-
-	pipe_cmd = parser(argv2, 1);
-	while (pipe_cmd && pipe_cmd->cmd)
-	{
-		exec_pipe_cmd(pipe_cmd);
-		pipe_cmd = parser(argv2, 0);
-	}
-	exit(ft_atoi(mygetenv(myenv, "?")));
-}
+/* qd on apl, il faut pas free le buffer original s'il vient de l'historique. sinon, on peut le free */
 
 void	del_char_buffer(char **buffer)
 {
@@ -101,7 +91,6 @@ void	del_char_buffer(char **buffer)
 	char	*tmp;
 	char	*old_buf;
 
-	// printf("%s\n", *buffer);
 	old_buf = *buffer;
 	i = 1;
 	if (ft_strlen(old_buf) > 0)

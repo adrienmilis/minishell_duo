@@ -1,47 +1,98 @@
 #include "msh.h"
 
-/* LEAKS ENCORE A GERER */
+/* 	
+	TOUJOURS DES PBS D'HISTORIQUE
+	QUAND ON MODIFIE UN BUFFER QUI VIENT DE L'HISTORIQUE
+	ET LEAKS QUAND ON SUPPRIME DES CHARS
+*/
 
-void	updown_event(int reset, char rd[3], t_command *begin_list, char **buffer)
+void	c_option(char *argv2)
 {
-	static t_command	*elem;
-	char				*tmp;
+	t_pipe_cmd	*pipe_cmd;
 
-	if (reset == 1)
-		elem = NULL;
-	if (begin_list->next == NULL)
-		return ;
-	if (rd[2] == 65) // up arrow
+	pipe_cmd = parser(argv2, 1);
+	while (pipe_cmd && pipe_cmd->cmd)
 	{
-		if (elem == NULL)
-			elem = begin_list;
-		else if (elem->next != NULL)
-			elem = elem->next;
-		while (ft_strlen(*buffer) > 0)
-			del_char_buffer(buffer);
+		exec_pipe_cmd(pipe_cmd);
+		free_pipe_cmd(pipe_cmd);
+		pipe_cmd = parser(argv2, 0);
+	}
+	free_pipe_cmd(pipe_cmd);
+	exit(ft_atoi(mygetenv(myenv, "?")));
+}
+
+void	func(void)
+{
+	tputs(tgetstr("le", NULL), 1, ft_putchar);
+	tputs(tgetstr("dc", NULL), 1, ft_putchar);
+}
+
+void	write_history_command(t_command *elem, char **buffer, int up)
+{
+	char	*tmp;
+
+	// printf("*buffer : [%s]\n", *buffer);
+	int len = ft_strlen(*buffer);
+	while (len > 0)
+	{
+		func();
+		len--;
+		// del_char_buffer(buffer);	
+	}
+	if (up)
+	{
 		if (elem->command)
 		{
 			tmp = *buffer;
 			*buffer = elem->command;
-			free(tmp);
+			// free(tmp);
 			ft_putstr(elem->command);
 		}
-	}
-	if (rd[2] == 66) // down arrow
-	{
-		if (elem == NULL || elem == begin_list)
-			elem = NULL;
 		else
-			elem = elem->prev;
-		while (ft_strlen(*buffer) > 0)
-			del_char_buffer(buffer);
+		{
+			*buffer = NULL;
+		}
+	}
+	else
+	{
 		if (elem)
 		{
 			tmp = *buffer;
 			*buffer = elem->command;
-			free(tmp);
+			// free(tmp);
 			ft_putstr(elem->command);
 		}
+		else
+		{
+			*buffer = NULL;
+		}
+	}
+}
+
+void	updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer)
+{
+	static t_command	*elem;
+
+	if (*rst == 1)
+		elem = NULL;
+	*rst = 0;
+	if (beg_list->next == NULL)
+		return ;
+	if (rd[2] == 65) // up arrow
+	{
+		if (elem == NULL)
+			elem = beg_list;
+		else if (elem->next != NULL)
+			elem = elem->next;
+		write_history_command(elem, buffer, 1);
+	}
+	if (rd[2] == 66) // down arrow
+	{
+		if (elem == NULL || elem == beg_list)
+			elem = NULL;
+		else
+			elem = elem->prev;
+		write_history_command(elem, buffer, 0);
 	}
 }
 
@@ -51,13 +102,19 @@ int	enter_event(char **buffer, t_command **begin_list)
 
 	write(1, "\n", 1);
 	pipe_cmd = parser(*buffer, 1);
+	if (pipe_cmd == NULL)
+	{
+		write(1, "megashell> ", 11);
+		return (1);
+	}
 	while (pipe_cmd && pipe_cmd->cmd)
 	{
 		exec_pipe_cmd(pipe_cmd);
+		free_pipe_cmd(pipe_cmd);
 		pipe_cmd = parser(*buffer, 0);
 	}
+	free_pipe_cmd(pipe_cmd);
 	ft_lstadd_front(begin_list, new_elem_history(*buffer));
-	free(*buffer);
 	*buffer = NULL;
 	write(1, "megashell> ", 11);
 	return (1);
@@ -83,17 +140,17 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
 			printf("RAJOUTER ERREUR");
 	}
 	else if (rd[0] == '\033')
-	{
-		updown_event(reset, rd, *begin_list, buffer);
-		reset = 0;
-	}
+		updown_event(&reset, rd, *begin_list, buffer);
 	else if (rd[0] == 127)
 	{
 		if (ft_strlen(*buffer) > 0)
 			del_char_buffer(buffer);
 	}
 	else if (rd[0] == 10)
+	{
 		reset = enter_event(buffer, begin_list);
+		// print_list_history(*begin_list);
+	}
 	return (ret);
 }
 
@@ -114,7 +171,7 @@ int	main2(char *buffer, t_command *begin_list, int c, char *argv2)
 		s_termios.c_lflag &= ~(ECHO);
 		if (tcsetattr(0, 0, &s_termios) == -1)
 			return (-1);
-		//write(1, "megashell> ", 11);
+		write(1, "megashell> ", 11);
 		while (ret > 0)
 			ret = read_input(&buffer, &begin_list, c, argv2);
 		if (tcsetattr(0, 0, &s_termios_backup) == -1)

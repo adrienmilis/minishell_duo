@@ -14,6 +14,9 @@ typedef struct s_command
 	struct s_command	*next;
 }				t_command;
 
+// parsing
+void		free_pipe_elems(t_pipe_cmd *c);
+void		free_pipe_cmd(t_pipe_cmd *begin_list);
 t_pipe_cmd	*parser(char *cmd, int mew_command);	// ajouter a execution.h
 int			ft_putchar(int c);
 
