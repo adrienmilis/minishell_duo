@@ -39,7 +39,7 @@ int	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign)
 	last = ft_lstlast(p_begin);
 	// word = get_next_word(cmd, p, p_cmd_start); // changer ici si on a simple ou double, faire une fct en plus qui get le word
 	word = get_redir_word(cmd, p, p_begin);
-	if (!word && p->var_not_exist)
+	if ((!word && p->var_not_exist) || (word && space_middle_of_word(word) && p->word_from_variable))
 	{
 		set_exit_status("ambiguous redirect", 1);
 		return (0);			
@@ -211,7 +211,7 @@ int	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 		word = get_next_word(cmd, p, p_begin);
 		if (word)
 		{
-			if (p->word_from_variable && real_space_in_word(word))
+			if (p->word_from_variable && space_in_word(word))
 				argument_w_spaces(word, 1, p_begin, p);
 			else
 				if (!append_arg(ft_lstlast(p_begin), word, NULL))
@@ -224,7 +224,7 @@ int	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 		word = get_next_word(cmd, p, p_begin);
 		if (word)
 		{
-			if (p->word_from_variable && real_space_in_word(word))
+			if (p->word_from_variable && space_in_word(word))
 				argument_w_spaces(word, 0, p_begin, p);
 			else
 				add_argument(word, p_begin);

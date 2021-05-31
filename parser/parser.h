@@ -88,7 +88,8 @@ int		valid_var_char(char c);
 // check_chars3.c
 int		is_unesc_simple(char *c, int i);
 int		is_unesc_double(char *c, int i);
-int		real_space_in_word(char	*word);
+int		space_in_word(char	*word);
+int	space_middle_of_word(char *word);
 
 // linked_list.c
 t_pipe_cmd	*ft_lstlast(t_pipe_cmd *begin_list);

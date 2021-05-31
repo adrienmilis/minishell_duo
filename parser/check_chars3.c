@@ -14,7 +14,7 @@ int	is_unesc_double(char *c, int i)
 	return (0);
 }
 
-int	real_space_in_word(char	*word)
+int	space_in_word(char	*word)
 {
 	int	i;
 
@@ -23,9 +23,25 @@ int	real_space_in_word(char	*word)
 		return (0);
 	while (word[i])
 	{
-		if (is_r_space(&word[i], i))
+		if (is_space(word[i]))
 			return (1);
 		i++;
 	}
+	return (0);
+}
+
+int	space_middle_of_word(char *word)
+{
+	int	i;
+
+	i = 0;
+	while (is_space(word[i]))
+		i++;
+	while (!is_space(word[i]) && word[i])
+		i++;
+	while (is_space(word[i]))
+		i++;
+	if (word[i])
+		return (1);
 	return (0);
 }
