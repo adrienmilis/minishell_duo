@@ -5,9 +5,8 @@ t_pipe_cmd	*parser(char *cmd, int new_command)
 	t_pipe_cmd		*p_cmd_start;
 	static t_pars	p;
 
-	if (!cmd || !cmd[0])
+	if (!cmd || !cmd[0] || !check_syntax(cmd))
 		return (NULL);
-	check_syntax(cmd);
 	init_pars_struct(&p, new_command, cmd[0]);
 	p_cmd_start = init_pipe_list();
 	while (!p.semicolon && cmd[p.i])
@@ -20,6 +19,6 @@ t_pipe_cmd	*parser(char *cmd, int new_command)
 			in_double_quotes(&p, p_cmd_start, cmd);
 	}
 	reset_pars_struct(&p);
-	// print_list(p_cmd_start);
+	print_list(p_cmd_start);
 	return (p_cmd_start);
 }
