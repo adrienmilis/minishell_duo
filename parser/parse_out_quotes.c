@@ -2,6 +2,7 @@
 
 char 	*get_redir_word(char *cmd, t_pars *p, t_pipe_cmd *p_begin)
 {
+	char	*new_word;
 	char	*word;
 
 	while (is_space(cmd[p->i]))
@@ -19,7 +20,12 @@ char 	*get_redir_word(char *cmd, t_pars *p, t_pipe_cmd *p_begin)
 		else if (cmd[p->i] == '"')
 			word = ft_strjoin_w_ns(word, arg_double_quotes(p, p_begin, cmd, 1));
 		else
-			word = ft_strjoin_w_ns(word, get_next_word(cmd, p, p_begin));
+		{
+			new_word = get_next_word(cmd, p, p_begin);
+			// printf("new word [%s]\n", new_word);
+			word = ft_strjoin_w_ns(word, new_word);
+			// printf("cat word [%s]\n", word);
+		}
 	}
 	return (word);
 }
@@ -116,6 +122,11 @@ int	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 
 int	must_append(int i, char *cmd, t_pars *p)
 {
+	if (p->var_not_exist == 1)
+	{
+		p->var_not_exist = 0;
+		return (0);
+	}
 	if (p->prev_var_w_space == 1)
 	{
 		p->prev_var_w_space = 0;
@@ -135,7 +146,7 @@ char	*make_word(char	*word, t_pipe_cmd *p_begin, t_pars *p)
 	while (is_space(word[i]) && word[i])	// !!!! tester une variable avec que des espaces ???
 		i++;
 	j = i;
-	while (!is_r_space(&word[i], i) && word[i])
+	while (!is_space(word[i]) && word[i])
 		i++;
 	if (j == i)
 	{
@@ -193,7 +204,6 @@ int	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 	else if (must_append(p->i, cmd, p)/*p->i != 0 && !is_r_space(&cmd[p->i - 1], p->i - 1) && !is_r_resvd_char(&cmd[p->i - 1], p->i - 1, 0)*/)
 	{
 		word = get_next_word(cmd, p, p_begin);
-		// printf("VAR : %d\n", p->word_from_variable);
 		if (word)
 		{
 			if (p->word_from_variable && real_space_in_word(word))
@@ -207,7 +217,6 @@ int	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 	else	// on est au debut d'un mot et pas de quote avant
 	{
 		word = get_next_word(cmd, p, p_begin);
-		// printf("VAR : %d\n", p->word_from_variable);
 		if (word)
 		{
 			if (p->word_from_variable && real_space_in_word(word))

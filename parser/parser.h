@@ -25,6 +25,7 @@ typedef struct s_pars
 	int	i;
 	int	prev_var_w_space;
 	int	word_from_variable;
+	int	var_not_exist;
 }				t_pars;
 
 // errors.c

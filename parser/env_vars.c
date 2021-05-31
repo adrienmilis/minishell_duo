@@ -83,10 +83,10 @@ char	*get_variable(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
 		return (NULL);
 	}
 	if (!valid_var_char(cmd[p->i]))
-	{
 		word = unvalid_var_name(p, cmd, p_begin);
-	}
 	else
 		word = valid_var_name(p, cmd, p_begin);
+	if (word == NULL)
+		p->var_not_exist = 1;
 	return (word);
 }
