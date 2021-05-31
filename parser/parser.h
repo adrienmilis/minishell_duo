@@ -66,8 +66,8 @@ void		reset_pars_struct(t_pars *p);
 void 	set_quotes(int i, char *cmd, t_pars *p);
 int		semicolons_valid(char *cmd);
 int		pipes_valid(char *cmd);
-void	are_quotes_closed(char *cmd);
-void	check_syntax(char *cmd);
+int		are_quotes_closed(char *cmd);
+int		check_syntax(char *cmd);
 
 // check_chars.c
 int		is_space(char c);
@@ -123,5 +123,9 @@ int				strcmp_env(char *s1, char *s2);
 // static size_t	strtablen(char **tab);
 // static char		**free_strtab(char **tab);
 char			**new_env(char **env);
+
+// execution
+char		*itoa_env_var(char *prefix, int n);
+
 
 #endif
