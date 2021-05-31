@@ -179,7 +179,7 @@ int	builtin_export(char **arg, int pid, int pipes)
 	{
 		while (*arg)
 		{
-			if (valid_env_name(*arg))
+			if (valid_env_name(*arg, 0))
 			{
 				if (var_is_in_env(myenv, *arg))
 				{
@@ -200,7 +200,7 @@ int	builtin_export(char **arg, int pid, int pipes)
 	}
 	else if (pid == 0)
 		while (*(arg++))
-			if (!valid_env_name(*(arg - 1)))
+			if (!valid_env_name(*(arg - 1), 0))
 				exit(1);
 	return (1);
 }
@@ -211,7 +211,7 @@ int	builtin_unset(char **arg, int pid, int pipes)
 	{
 		while (*arg)
 		{
-			if (valid_env_name(*arg))
+			if (valid_env_name(*arg, 1))
 			{
 				if (var_is_in_env(myenv, *arg))
 					myenv = rm_env_var(myenv, *arg);
@@ -227,7 +227,7 @@ int	builtin_unset(char **arg, int pid, int pipes)
 	}
 	else if (pid == 0)
 		while (*(arg++))
-			if (!valid_env_name(*(arg - 1)))
+			if (!valid_env_name(*(arg - 1), 1))
 				exit(1);
 	return (1);
 }

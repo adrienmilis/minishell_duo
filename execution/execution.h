@@ -36,7 +36,7 @@ void	sort_env(char **env);
 char	**add_env_var(char **env, char *var);
 char	**add_env_var_value(char **env, char *varname, char *varvalue);
 char	**rm_env_var(char **env, char *var);
-int		valid_env_name(char *var);
+int		valid_env_name(char *var, int unset);
 int		var_is_in_env(char **env, char *var);
 int		var_has_value(char *var);
 int		modif_env_var(char **env, char *var);

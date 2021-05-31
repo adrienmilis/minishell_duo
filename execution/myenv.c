@@ -200,7 +200,7 @@ char	**rm_env_var(char **env, char *var)
 	return (res);
 }
 
-int		valid_env_name(char *var) //remplacer par ft_is* si on met la libft
+int		valid_env_name(char *var, int unset) //remplacer par ft_is* si on met la libft
 {
 	size_t	i;
 
@@ -210,7 +210,7 @@ int		valid_env_name(char *var) //remplacer par ft_is* si on met la libft
 			&& !('a' <= var[0] && var[0] <= 'z') && var[0] != '_')
 		return (0);
 	i = 1;
-	while (var[i] && var[i] != '=')
+	while (var[i] && (var[i] != '=' || unset))
 	{
 		if (!('0' <= var[i] && var[i] <= '9')
 				&& !('A' <= var[i] && var[i] <= 'Z')
