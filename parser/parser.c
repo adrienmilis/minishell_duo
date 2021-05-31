@@ -19,6 +19,6 @@ t_pipe_cmd	*parser(char *cmd, int new_command)
 			in_double_quotes(&p, p_cmd_start, cmd);
 	}
 	reset_pars_struct(&p);
-	print_list(p_cmd_start);
+	// print_list(p_cmd_start);
 	return (p_cmd_start);
 }
