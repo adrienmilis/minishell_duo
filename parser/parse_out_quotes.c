@@ -39,6 +39,11 @@ int	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign)
 	last = ft_lstlast(p_begin);
 	// word = get_next_word(cmd, p, p_cmd_start); // changer ici si on a simple ou double, faire une fct en plus qui get le word
 	word = get_redir_word(cmd, p, p_begin);
+	if (!word && p->var_not_exist)
+	{
+		set_exit_status("ambiguous redirect", 1);
+		return (0);			
+	}
 	if (sign == '>')
 	{
 		if (!word)
