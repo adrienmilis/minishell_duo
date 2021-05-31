@@ -70,7 +70,7 @@ void	write_history_command(t_command *elem, char **buffer, int up)
 	}
 }
 
-void	updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer)
+void	updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer, int *in_history)
 {
 	static t_command	*elem;
 
@@ -85,12 +85,16 @@ void	updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer)
 			elem = beg_list;
 		else if (elem->next != NULL)
 			elem = elem->next;
+		*in_history = 1;
 		write_history_command(elem, buffer, 1);
 	}
 	if (rd[2] == 66) // down arrow
 	{
 		if (elem == NULL || elem == beg_list)
+		{
 			elem = NULL;
+			*in_history = 0;
+		}
 		else
 			elem = elem->prev;
 		write_history_command(elem, buffer, 0);
@@ -106,6 +110,7 @@ int	enter_event(char **buffer, t_command **begin_list)
 	if (pipe_cmd == NULL)
 	{
 		write(1, "megashell> ", 11);
+		free(*buffer);
 		*buffer = NULL;
 		return (1);
 	}
@@ -118,6 +123,7 @@ int	enter_event(char **buffer, t_command **begin_list)
 	}
 	free_pipe_cmd(pipe_cmd);
 	ft_lstadd_front(begin_list, new_elem_history(*buffer));
+	free(*buffer);
 	*buffer = NULL;
 	write(1, "megashell> ", 11);
 	return (1);
@@ -128,10 +134,12 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
 	char		rd[4];
 	int			ret;
 	static int	reset;
+	static int	in_history;
 
 	if (c)
 		c_option(argv2);
 	
+
 	ret = read(0, &rd, 4);
 	if (ret == -1)
 		exit(ret);
@@ -143,11 +151,11 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
 			printf("RAJOUTER ERREUR");
 	}
 	else if (rd[0] == '\033')
-		updown_event(&reset, rd, *begin_list, buffer);
+		updown_event(&reset, rd, *begin_list, buffer, &in_history);
 	else if (rd[0] == 127)
 	{
 		if (ft_strlen(*buffer) > 0)
-			del_char_buffer(buffer);
+			del_char_buffer(buffer, &in_history);
 	}
 	else if (rd[0] == 10)
 	{

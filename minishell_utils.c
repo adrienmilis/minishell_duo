@@ -84,14 +84,20 @@ char	*make_buffer(char *buf, char c)
 
 /* qd on apl, il faut pas free le buffer original s'il vient de l'historique. sinon, on peut le free */
 
-void	del_char_buffer(char **buffer)
+void	del_char_buffer(char **buffer, int *in_history)
 {
 	char	*new_buffer;
 	int		i;
 	char	*tmp;
 	char	*old_buf;
 
-	old_buf = *buffer;
+	if (*in_history)
+	{
+		old_buf = ft_strdup(*buffer);
+		*in_history = 0;
+	}
+	else
+		old_buf = *buffer;
 	i = 1;
 	if (ft_strlen(old_buf) > 0)
 	{
@@ -106,8 +112,8 @@ void	del_char_buffer(char **buffer)
 		new_buffer[i - 1] = 0;
 		tmp = old_buf;
 		*buffer = new_buffer;
-		// if (tmp)
-		// 	free(tmp);
+		if (tmp)
+			free(tmp);
 		tputs(tgetstr("le", NULL), 1, ft_putchar);
 		tputs(tgetstr("dc", NULL), 1, ft_putchar);
 	}

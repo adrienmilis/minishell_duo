@@ -7,6 +7,8 @@
 #include <string.h>
 #include "execution/execution.h"
 
+// int	in_history;
+
 typedef struct s_command
 {
 	char				*command;
@@ -26,7 +28,7 @@ int			init_termcap();
 void		shlvl();
 char		*make_buffer(char *buf, char c);
 void		c_option(char *argv2);
-void		del_char_buffer(char **buffer);
+void		del_char_buffer(char **buffer, int *in_history);
 void		ft_putstr(char *str);
 
 // list_utils.c

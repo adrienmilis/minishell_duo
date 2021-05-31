@@ -3,13 +3,17 @@
 t_command	*new_elem_history(char *str)
 {
 	t_command	*new_elem;
+	char		*command;
 
 	new_elem = malloc(sizeof(t_command));
 	if (!new_elem)
 		return (NULL);
+	command = ft_strdup(str);
+	if (!command)
+		return (NULL);
 	new_elem->next = NULL;
 	new_elem->prev = NULL;
-	new_elem->command = str;
+	new_elem->command = command;
 	return (new_elem);
 }
 
