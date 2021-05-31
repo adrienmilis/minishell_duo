@@ -6,6 +6,29 @@
 	ET LEAKS QUAND ON SUPPRIME DES CHARS
 */
 
+int		ctrlC(int new_value)
+{
+	static int	b;
+	int			ret;
+
+	ret = b;
+	b = new_value;
+	return (ret);
+}
+
+void	handler_sigint(int sig)
+{
+	(void)sig;
+	write(1, "\nmegashell> ", 12);
+	ctrlC(1);
+}
+
+void	nothing_sigquit(int sig)
+{
+	(void)sig;
+	return ;
+}
+
 void	c_option(char *argv2)
 {
 	t_pipe_cmd	*pipe_cmd;
@@ -140,7 +163,13 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
 		c_option(argv2);
 	
 
+	signal(SIGINT, &handler_sigint);
 	ret = read(0, &rd, 4);
+	if (ctrlC(0))
+	{
+		free(*buffer);
+		*buffer = NULL;
+	}
 	if (ret == -1)
 		exit(ret);
 	if (ft_isprint(rd[0]))
@@ -211,6 +240,7 @@ int	main(int argc, char **argv, char **env)
 	int			c;
 	int			ret;
 
+	signal(SIGQUIT, &nothing_sigquit);
 	c = 0;
 	if (argc == 3 && argv[1][0] == '-' && argv[1][1] == 'c')
 		c = 1;

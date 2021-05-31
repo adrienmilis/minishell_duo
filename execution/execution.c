@@ -442,6 +442,12 @@ void	launch_executable(char **cmd)
 	exit(127);
 }
 
+void	nothing_sigint(int sig)
+{
+	(void)sig;
+	return ;
+}
+
 void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd)
 {
 	int	pipefd[2][2];
@@ -461,6 +467,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd)
 		pipefd[0][0] = pipefd[1][0];
 		pipefd[0][1] = pipefd[1][1];
 		pipe(pipefd[1]);
+		signal(SIGINT, &nothing_sigint);
 		pid = fork();
 		if (pid == 0)
 		{
