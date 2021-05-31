@@ -69,6 +69,13 @@ int	pipes_valid(char *cmd)
 	return (1);
 }
 
+void	set_exit_status(char *error, int status)
+{
+	printf("minishell: %s\n", error);
+	free(myenv[0]);
+	myenv[0] = itoa_env_var("?=", status);
+}
+
 int	are_quotes_closed(char *cmd)
 {
 	int		i;
@@ -80,16 +87,12 @@ int	are_quotes_closed(char *cmd)
 		set_quotes(i, cmd, &p);
 	if (p.in_s_quotes != 0)
 	{
-		printf("minishell: unexpected EOF while looking for matching `''\n");
-		free(myenv[0]);
-		myenv[0] = itoa_env_var("?=", 2);
+		set_exit_status("unexpected EOF while looking for matching `''", 2);
 		return (0);
 	}
 	if (p.in_d_quotes != 0)
 	{
-		printf("minishell: unexpected EOF while looking for matching `\"'\n");
-		free(myenv[0]);
-		myenv[0] = itoa_env_var("?=", 2);
+		set_exit_status("unexpected EOF while looking for matching `\"'", 2);
 		return (0);
 	}
 	return (1);
@@ -101,16 +104,12 @@ int	check_syntax(char *cmd)
 		return (0);
 	if (!semicolons_valid(cmd))
 	{
-		printf("minishell: syntax error near unexpected token `;'\n");
-		free(myenv[0]);
-		myenv[0] = itoa_env_var("?=", 2);
+		set_exit_status("syntax error near unexpected token `;'", 2);
 		return (0);
 	}
 	if (!pipes_valid(cmd))
 	{
-		printf("minishell: syntax error near unexpected token `|'\n");
-		free(myenv[0]);
-		myenv[0] = itoa_env_var("?=", 2);
+		set_exit_status("syntax error near unexpected token `|'", 2);
 		return (0);
 	}
 	return (1);

@@ -11,9 +11,10 @@ void	c_option(char *argv2)
 	t_pipe_cmd	*pipe_cmd;
 
 	pipe_cmd = parser(argv2, 1);
-	while (pipe_cmd && pipe_cmd->cmd)
+	while (pipe_cmd /*&& pipe_cmd->cmd*/)
 	{
-		exec_pipe_cmd(pipe_cmd);
+		if (pipe_cmd->cmd)
+			exec_pipe_cmd(pipe_cmd);
 		free_pipe_cmd(pipe_cmd);
 		pipe_cmd = parser(argv2, 0);
 	}
@@ -105,11 +106,13 @@ int	enter_event(char **buffer, t_command **begin_list)
 	if (pipe_cmd == NULL)
 	{
 		write(1, "megashell> ", 11);
+		*buffer = NULL;
 		return (1);
 	}
-	while (pipe_cmd && pipe_cmd->cmd)
+	while (pipe_cmd /*&& pipe_cmd->cmd*/)
 	{
-		exec_pipe_cmd(pipe_cmd);
+		if (pipe_cmd->cmd)
+			exec_pipe_cmd(pipe_cmd);
 		free_pipe_cmd(pipe_cmd);
 		pipe_cmd = parser(*buffer, 0);
 	}

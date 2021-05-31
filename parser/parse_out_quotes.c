@@ -24,7 +24,7 @@ char 	*get_redir_word(char *cmd, t_pars *p, t_pipe_cmd *p_begin)
 	return (word);
 }
 
-void	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign)
+int	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign)
 {
 	char		*word;
 	t_pipe_cmd	*last;
@@ -36,25 +36,37 @@ void	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign)
 	if (sign == '>')
 	{
 		if (!word)
-			error_exit("syntax error near unexpected token `>'", p_begin); // pas de leak si on exit sans free word ??
+		{
+			set_exit_status("syntax error near unexpected token `>'", 2);
+			return (0);
+			// free ?
+			// error_exit("syntax error near unexpected token `>'", p_begin); // pas de leak si on exit sans free word ??
+		}
 		if (last->output)
 			free(last->output);
-		fd = open(word, O_RDONLY | O_CREAT, 0644);
+		if (!last->double_greater)
+			fd = open(word, O_RDONLY | O_CREAT | O_TRUNC, 0644);
+		else
+			fd = open(word, O_RDONLY | O_CREAT, 0644);
 		close(fd);
 		last->output = word;
-		return ;
 	}
-	if (sign == '<')
+	else if (sign == '<')
 	{
 		if (!word)
-			error_exit("syntax error near unexpected token `<'", p_begin); // pas de leak si on exit sans free word ??
+		{
+			set_exit_status("syntax error near unexpected token `<'", 2);
+			return (0);
+			// error_exit("syntax error near unexpected token `<'", p_begin); // pas de leak si on exit sans free word ??
+		}
 		if (last->input)
 			free(last->input);
 		last->input = word;
 	}
+	return (1);
 }
 
-void	real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
+int	real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 {
 	t_pipe_cmd	*last;
 	char		sign;
@@ -72,10 +84,12 @@ void	real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 			last->double_greater = 0;
 	}
 	p->i += 1;
-	real_sign2(p, p_cmd_start, cmd, sign);
+	if (!(real_sign2(p, p_cmd_start, cmd, sign)))
+		return (0);
+	return (1);
 }
 
-void	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
+int	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 {
 	t_pipe_cmd	*n_elem;
 
@@ -83,10 +97,12 @@ void	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 	{
 		p->semicolon = 1;
 		p->i += 1;
-		return ;
 	}
 	else if (cmd[p->i] == '>' || cmd[p->i] == '<')
-		real_sign(p, p_cmd_start, cmd);
+	{
+		if (!real_sign(p, p_cmd_start, cmd))
+			return (0);
+	}
 	else if (cmd[p->i] == '|')
 	{
 		n_elem = new_elem();
@@ -95,6 +111,7 @@ void	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 		ft_lstadd_back(&p_cmd_start, n_elem);
 		p->i += 1;
 	}
+	return (1);
 }
 
 int	must_append(int i, char *cmd, t_pars *p)
@@ -154,16 +171,20 @@ void	argument_w_spaces(char *word, int append, t_pipe_cmd *p_begin, t_pars *p)
 	}
 }
 
-void	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
+int	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 {
 	char	*word;
 
 	if (is_r_resvd_char(&cmd[p->i], p->i, 0))
-		reserved_chars(p, p_begin, cmd);
+	{
+		if (!reserved_chars(p, p_begin, cmd))
+			return (0);
+	}
 	else if (is_r_space(&cmd[p->i], p->i))
 	{
 		p->i += 1;
-		out_quotes(p, p_begin, cmd);
+		if (!(out_quotes(p, p_begin, cmd)))
+			return (0);
 	}
 	else if (cmd[p->i] == '\'')
 		p->in_s_quotes = 1;
@@ -196,4 +217,5 @@ void	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 		}
 		p->word_from_variable = 0; // ici ?
 	}
+	return (1);
 }

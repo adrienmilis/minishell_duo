@@ -34,11 +34,11 @@ void	error_exit(char *msg, t_pipe_cmd *begin_list);
 
 // parse_out_quotes.c
 char 	*get_redir_word(char *cmd, t_pars *p, t_pipe_cmd *p_begin);
-void	real_sign2(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, char sign);
-void	real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
-void	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
+int		real_sign2(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, char sign);
+int		real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
+int		reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
 int		must_append(int i, char *cmd, t_pars *p);
-void	out_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
+int		out_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
 
 // double_quotes.c
 void	doubleq_special(t_pars *p, char *cmd, t_pipe_cmd *p_begin, char **buff);
@@ -68,6 +68,7 @@ int		semicolons_valid(char *cmd);
 int		pipes_valid(char *cmd);
 int		are_quotes_closed(char *cmd);
 int		check_syntax(char *cmd);
+void	set_exit_status(char *error, int status);
 
 // check_chars.c
 int		is_space(char c);
