@@ -68,12 +68,23 @@ int	builtin_echo(char **arg, int pid)
 	return (1);
 }
 
-void	oldpwd()
+void	cd_oldpwd()
 {
 	if (!var_is_in_env(myenv, "OLDPWD"))
 		myenv = add_env_var_value(myenv, "OLDPWD", mygetenv(myenv, "PWD"));
 	else
 		modif_env_var_value(myenv, "OLDPWD", mygetenv(myenv, "PWD"));
+}
+
+void	cd_pwd()
+{
+	char	*cwd;
+
+	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		exit(0); //quel exit status ?
+	modif_env_var_value(myenv, "PWD", cwd);
+	free(cwd);
 }
 
 int	builtin_cd(char **arg, int pid, int pipes)
@@ -93,15 +104,15 @@ int	builtin_cd(char **arg, int pid, int pipes)
 			}
 			else
 			{
-				oldpwd();
-				modif_env_var_value(myenv, "PWD", getcwd(NULL, 0));
+				cd_oldpwd();
+				cd_pwd();
 			}
 		}
 		else if (pid == 0 && chdir(*arg) < 0)
 			exit(1);
 	}
 	else
-		oldpwd();
+		cd_oldpwd();
 	return (1);
 }
 
