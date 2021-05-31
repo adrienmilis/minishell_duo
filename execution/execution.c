@@ -122,9 +122,12 @@ int	builtin_pwd(int pid)
 
 	if (pid == 0)
 	{
-		pwd = mygetenv(myenv, "PWD");
+		pwd = getcwd(NULL, 0);
+		if (!pwd)
+			exit(0); //
 		write(1, pwd, ft_strlen(pwd));
 		write(1, "\n", 1);
+		free(pwd);
 	}
 	return (1);
 }
