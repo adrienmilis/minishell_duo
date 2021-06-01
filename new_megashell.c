@@ -1,11 +1,5 @@
 #include "msh.h"
 
-/* 	
-	TOUJOURS DES PBS D'HISTORIQUE
-	QUAND ON MODIFIE UN BUFFER QUI VIENT DE L'HISTORIQUE
-	ET LEAKS QUAND ON SUPPRIME DES CHARS
-*/
-
 int		ctrlC(int new_value)
 {
 	static int	b;
@@ -51,17 +45,6 @@ void	func(void)
 {
 	tputs(tgetstr("le", NULL), 1, ft_putchar);
 	tputs(tgetstr("dc", NULL), 1, ft_putchar);
-}
-
-void	error_free(char *buffer, t_command *begin_list)
-{
-	if (buffer)
-		free(buffer);
-	free_list(begin_list);
-	if (myenv)
-		free_strtab(myenv);
-	ft_putstr("minishell: fatal error\n");
-	exit(0);	// quel code pour exit ?
 }
 
 void	write_history_command(t_command *elem, char **buffer, int up, t_command *beg_list)
@@ -141,7 +124,7 @@ int	enter_event(char **buffer, t_command **begin_list)
 	free_pipe_cmd(pipe_cmd);
 	new_elem = new_elem_history(*buffer);
 	if (!new_elem)
-		printf("free ici\n");	// buffer if exists, t_command
+		error_free(*buffer, *begin_list);	// buffer if exists, t_command
 	ft_lstadd_front(begin_list, new_elem);
 	free(*buffer);
 	*buffer = NULL;
@@ -163,7 +146,7 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)	// plu
 	signal(SIGINT, &handler_sigint);
 	ret = read(0, &rd, 4);
 	if (ret == -1)
-		printf("free ici\n");	// free t_command and myenv (1st call) ; free t_command, myenv, buffer (2e call)
+		error_free(*buffer, *begin_list);	// free t_command and myenv (1st call) ; free t_command, myenv, buffer (2e call)
 	if (ctrlC(0))
 	{
 		free(*buffer);
@@ -174,7 +157,7 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)	// plu
 		write(1, &rd[0], 1);
 		*buffer = make_buffer(*buffer, rd[0]);
 		if (*buffer == NULL)
-			printf("RAJOUTER ERREUR");	// free t_command and myenv (old buffer is already freed)
+			error_free(*buffer, *begin_list);	// free t_command and myenv (old buffer is already freed)
 	}
 	else if (rd[0] == '\033')
 		updown_event(&reset, rd, *begin_list, buffer);
@@ -250,9 +233,10 @@ int	main(int argc, char **argv, char **env)
 	{
 		myenv = add_env_var_value(myenv, "PWD", getcwd(NULL, 0));
 		if (!myenv)
-			printf("free ici\n"); // free t_command, myenv
+			error_free(NULL, begin_list);
 	}
-	shlvl();
+	if (!(shlvl()))
+		error_free(buffer, begin_list);
 	ret = main2(buffer, begin_list, c, argv[2]);	// on est ici
 	if (buffer)
 		free(buffer);

@@ -24,8 +24,9 @@ int			ft_putchar(int c);
 
 // minishell_utils.c
 int			ft_isprint(int c);
+void		error_free(char *buffer, t_command *begin_list);
 int			init_termcap();
-void		shlvl();
+int			shlvl();
 char		*make_buffer(char *buf, char c);
 void		c_option(char *argv2);
 void		del_char_buffer(char **buffer, t_command *begin_list);

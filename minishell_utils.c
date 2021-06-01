@@ -19,6 +19,17 @@ void	ft_putstr(char *str)
 	write(1, str, str_len);
 }
 
+void	error_free(char *buffer, t_command *begin_list)
+{
+	if (buffer)
+		free(buffer);
+	free_list(begin_list);
+	if (myenv)
+		free_strtab(myenv);
+	ft_putstr("minishell: fatal error\n");
+	exit(0);
+}
+
 int	init_termcap()
 {
 	int		ret;
@@ -33,7 +44,7 @@ int	init_termcap()
 	return (0);
 }
 
-void	shlvl()
+int	shlvl()
 {
 	int		shlvl;
 	size_t	i;
@@ -42,7 +53,7 @@ void	shlvl()
 	{
 		myenv = add_env_var_value(myenv, "SHLVL", "1");
 		if (!myenv)
-			printf("free ici\n");	// free t_command, myenv;
+			return (0);	// free t_command, myenv;
 	}
 	else
 	{
@@ -62,8 +73,9 @@ void	shlvl()
 		free(myenv[i]);
 		myenv[i] = itoa_env_var("SHLVL=", shlvl);
 		if (!myenv[i])
-			printf("free ici\n"); // free t_command, myenv
+			return (0); // free t_command, myenv
 	}
+	return (1);
 }
 
 char	*make_buffer(char *buf, char c)
@@ -105,7 +117,7 @@ void	del_char_buffer(char **buffer, t_command *begin_list)
 	i = 1;
 	new_buffer = malloc(ft_strlen(old_buf) * sizeof(char));
 	if (!new_buffer)
-		printf("free ici\n");	// free t_command, myenv, buffer
+		error_free(*buffer, begin_list);	// free t_command, myenv, buffer
 	while (old_buf[i])
 	{
 		new_buffer[i - 1] = old_buf[i - 1];
