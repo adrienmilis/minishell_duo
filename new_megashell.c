@@ -167,6 +167,12 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)	// plu
 		if (ft_strlen(*buffer) > 0)
 			del_char_buffer(buffer, *begin_list);
 	}
+	else if (rd[0] == 4 && ft_strlen(*buffer) == 0)
+	{
+		write(1, "exit\n", 5);
+		//leaks ?
+		exit(0);
+	}
 	else if (rd[0] == 10)
 		reset = enter_event(buffer, begin_list);
 	return (ret);
