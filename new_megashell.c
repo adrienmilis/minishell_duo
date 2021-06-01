@@ -32,12 +32,14 @@ void	nothing_sigquit(int sig)
 void	c_option(char *argv2)
 {
 	t_pipe_cmd	*pipe_cmd;
+	int			backslash;
 
+	backslash = 1;
 	pipe_cmd = parser(argv2, 1);
 	while (pipe_cmd)
 	{
 		if (pipe_cmd->cmd)
-			exec_pipe_cmd(pipe_cmd);
+			exec_pipe_cmd(pipe_cmd, &backslash);
 		free_pipe_cmd(pipe_cmd);
 		pipe_cmd = parser(argv2, 0);
 	}
@@ -49,6 +51,17 @@ void	func(void)
 {
 	tputs(tgetstr("le", NULL), 1, ft_putchar);
 	tputs(tgetstr("dc", NULL), 1, ft_putchar);
+}
+
+void	error_free(char *buffer, t_command *begin_list)
+{
+	if (buffer)
+		free(buffer);
+	free_list(begin_list);
+	if (myenv)
+		free_strtab(myenv);
+	ft_putstr("minishell: fatal error\n");
+	exit(0);	// quel code pour exit ?
 }
 
 void	write_history_command(t_command *elem, char **buffer, int up, t_command *beg_list)
@@ -128,7 +141,7 @@ int	enter_event(char **buffer, t_command **begin_list)
 	free_pipe_cmd(pipe_cmd);
 	new_elem = new_elem_history(*buffer);
 	if (!new_elem)
-		printf("free ici\n");	// buffer if exists, t_command, buffer
+		printf("free ici\n");	// buffer if exists, t_command
 	ft_lstadd_front(begin_list, new_elem);
 	free(*buffer);
 	*buffer = NULL;
