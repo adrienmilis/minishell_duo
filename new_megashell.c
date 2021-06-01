@@ -221,6 +221,19 @@ void	init_begin_list(t_command **begin_list)
 	l_begin->command = NULL;
 }
 
+void	first_pwd(t_command *begin_list)
+{
+	char	*cwd;
+
+	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		error_free(NULL, begin_list);
+	myenv = add_env_var_value(myenv, "PWD", cwd);
+	if (!myenv)
+		error_free(NULL, begin_list);
+	free(cwd);
+}
+
 int	main(int argc, char **argv, char **env)
 {
 	char		*buffer;
@@ -236,11 +249,7 @@ int	main(int argc, char **argv, char **env)
 	buffer = NULL;
 	myenv = new_env(env);
 	if (!var_is_in_env(myenv, "PWD"))
-	{
-		myenv = add_env_var_value(myenv, "PWD", getcwd(NULL, 0));
-		if (!myenv)
-			error_free(NULL, begin_list);
-	}
+		first_pwd(begin_list);
 	if (!(shlvl()))
 		error_free(buffer, begin_list);
 	ret = main2(buffer, begin_list, c, argv[2]);	// on est ici
