@@ -27,7 +27,7 @@ typedef struct			s_pipe_cmd
 	struct s_command	*next;
 }						t_command;*/
 
-void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd);
+void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash);
 
 size_t	strlen_env_var(char *var);
 int		strcmp_env(const char *s1, const char *s2);
