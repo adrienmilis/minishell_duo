@@ -53,9 +53,9 @@ void	func(void)
 
 void	write_history_command(t_command *elem, char **buffer, int up, t_command *beg_list)
 {
-	// char	*tmp;
-
-	int len = ft_strlen(*buffer);
+	int len;
+	
+	len = ft_strlen(*buffer);
 	while (len > 0)
 	{
 		func();
@@ -66,26 +66,13 @@ void	write_history_command(t_command *elem, char **buffer, int up, t_command *be
 		free(*buffer);
 		*buffer = NULL;
 	}
-	// if (up)
-	// {
-		if ((!up && elem) || (up && elem->command))
-		{
-			*buffer = elem->command;
-			ft_putstr(elem->command);
-		}
-		else
-			*buffer = NULL;
-	// }
-	// else
-	// {
-	// 	if (elem)
-	// 	{
-	// 		*buffer = elem->command;
-	// 		ft_putstr(elem->command);
-	// 	}
-	// 	else
-	// 		*buffer = NULL;
-	// }
+	if ((!up && elem) || (up && elem->command))
+	{
+		*buffer = elem->command;
+		ft_putstr(elem->command);
+	}
+	else
+		*buffer = NULL;
 }
 
 void	updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer)
@@ -118,7 +105,10 @@ void	updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer)
 int	enter_event(char **buffer, t_command **begin_list)
 {
 	t_pipe_cmd	*pipe_cmd;
+	t_command	*new_elem;
+	int			backslash;
 
+	backslash = 1;
 	write(1, "\n", 1);
 	pipe_cmd = parser(*buffer, 1);
 	if (pipe_cmd == NULL)
@@ -128,22 +118,27 @@ int	enter_event(char **buffer, t_command **begin_list)
 		*buffer = NULL;
 		return (1);
 	}
-	while (pipe_cmd /*&& pipe_cmd->cmd*/)
+	while (pipe_cmd)
 	{
 		if (pipe_cmd->cmd)
-			exec_pipe_cmd(pipe_cmd);
+			exec_pipe_cmd(pipe_cmd, &backslash);	// free pipe_cmd on exit
 		free_pipe_cmd(pipe_cmd);
 		pipe_cmd = parser(*buffer, 0);
 	}
 	free_pipe_cmd(pipe_cmd);
-	ft_lstadd_front(begin_list, new_elem_history(*buffer));
+	new_elem = new_elem_history(*buffer);
+	if (!new_elem)
+		printf("free ici\n");	// buffer if exists, t_command, buffer
+	ft_lstadd_front(begin_list, new_elem);
 	free(*buffer);
 	*buffer = NULL;
+	if (backslash)
+		write(1, "\n", 1);
 	write(1, "megashell> ", 11);
 	return (1);
 }
 
-int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
+int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)	// plusieurs comportements pour free : 1er passage && suivants
 {
 	char		rd[4];
 	int			ret;
@@ -152,22 +147,21 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
 	if (c)
 		c_option(argv2);
 	
-
 	signal(SIGINT, &handler_sigint);
 	ret = read(0, &rd, 4);
+	if (ret == -1)
+		printf("free ici\n");	// free t_command and myenv (1st call) ; free t_command, myenv, buffer (2e call)
 	if (ctrlC(0))
 	{
 		free(*buffer);
 		*buffer = NULL;
 	}
-	if (ret == -1)
-		exit(ret);
 	if (ft_isprint(rd[0]))
 	{
 		write(1, &rd[0], 1);
 		*buffer = make_buffer(*buffer, rd[0]);
 		if (*buffer == NULL)
-			printf("RAJOUTER ERREUR");
+			printf("RAJOUTER ERREUR");	// free t_command and myenv (old buffer is already freed)
 	}
 	else if (rd[0] == '\033')
 		updown_event(&reset, rd, *begin_list, buffer);
@@ -177,10 +171,7 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
 			del_char_buffer(buffer, *begin_list);
 	}
 	else if (rd[0] == 10)
-	{
 		reset = enter_event(buffer, begin_list);
-		// print_list_history(*begin_list);
-	}
 	return (ret);
 }
 
@@ -201,7 +192,8 @@ int	main2(char *buffer, t_command *begin_list, int c, char *argv2)
 		s_termios.c_lflag &= ~(ECHO);
 		if (tcsetattr(0, 0, &s_termios) == -1)
 			return (-1);
-		// write(1, "megashell> ", 11);
+		if (!c)
+			write(1, "megashell> ", 11);
 		while (ret > 0)
 			ret = read_input(&buffer, &begin_list, c, argv2);
 		if (tcsetattr(0, 0, &s_termios_backup) == -1)
@@ -216,7 +208,10 @@ void	init_begin_list(t_command **begin_list)
 
 	*begin_list = malloc(sizeof(t_command));
 	if (begin_list == NULL)
-		exit(0);	// exit with free and/or msg ?
+	{
+		printf("minishell: malloc error\n");
+		exit(0);
+	}
 	l_begin = *begin_list;
 	l_begin->next = NULL;
 	l_begin->prev = NULL;
@@ -239,9 +234,13 @@ int	main(int argc, char **argv, char **env)
 	buffer = NULL;
 	myenv = new_env(env);
 	if (!var_is_in_env(myenv, "PWD"))
+	{
 		myenv = add_env_var_value(myenv, "PWD", getcwd(NULL, 0));
+		if (!myenv)
+			printf("free ici\n"); // free t_command, myenv
+	}
 	shlvl();
-	ret = main2(buffer, begin_list, c, argv[2]);
+	ret = main2(buffer, begin_list, c, argv[2]);	// on est ici
 	if (buffer)
 		free(buffer);
 	free_list(begin_list);

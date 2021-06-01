@@ -39,13 +39,17 @@ void	shlvl()
 	size_t	i;
 
 	if (!var_is_in_env(myenv, "SHLVL"))
+	{
 		myenv = add_env_var_value(myenv, "SHLVL", "1");
+		if (!myenv)
+			printf("free ici\n");	// free t_command, myenv;
+	}
 	else
 	{
 		i = 0;
 		while (strcmp_env(myenv[i], "SHLVL"))
 			i++;
-		shlvl = ft_atoi(mygetenv(myenv, "SHLVL")) + 1;
+		shlvl = ft_atoi(mygetenv(myenv, "SHLVL")) + 1; // proteger ft_atoi
 		if (shlvl > 1000)
 		{
 			write(2, "minishell: warning: shell level (", 33);
@@ -57,6 +61,8 @@ void	shlvl()
 			shlvl = 0;
 		free(myenv[i]);
 		myenv[i] = itoa_env_var("SHLVL=", shlvl);
+		if (!myenv[i])
+			printf("free ici\n"); // free t_command, myenv
 	}
 }
 
@@ -70,7 +76,10 @@ char	*make_buffer(char *buf, char c)
 	buf_len = ft_strlen(buf);
 	buf_cpy = malloc((buf_len + 2) * sizeof(char));
 	if (buf_cpy == NULL)
+	{
+		free(buf);
 		return (NULL);
+	}
 	while (i < buf_len)
 	{
 		buf_cpy[i] = buf[i];
@@ -81,8 +90,6 @@ char	*make_buffer(char *buf, char c)
 	free(buf);
 	return (buf_cpy);
 }
-
-/* qd on apl, il faut pas free le buffer original s'il vient de l'historique. sinon, on peut le free */
 
 void	del_char_buffer(char **buffer, t_command *begin_list)
 {
@@ -98,7 +105,7 @@ void	del_char_buffer(char **buffer, t_command *begin_list)
 	i = 1;
 	new_buffer = malloc(ft_strlen(old_buf) * sizeof(char));
 	if (!new_buffer)
-		printf("RAJOUTER ERREUR\n");
+		printf("free ici\n");	// free t_command, myenv, buffer
 	while (old_buf[i])
 	{
 		new_buffer[i - 1] = old_buf[i - 1];

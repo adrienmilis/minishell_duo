@@ -71,7 +71,8 @@ int	pipes_valid(char *cmd)
 
 void	set_exit_status(char *error, int status)
 {
-	printf("minishell: %s\n", error);
+	ft_putstr("minishell: ");
+	ft_putstr(error);
 	free(myenv[0]);
 	myenv[0] = itoa_env_var("?=", status);
 }
