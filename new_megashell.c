@@ -144,6 +144,7 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)	// plu
 		c_option(argv2);
 	
 	signal(SIGINT, &handler_sigint);
+	signal(SIGQUIT, &nothing_sigquit);
 	ret = read(0, &rd, 4);
 	if (ret == -1)
 		error_free(*buffer, *begin_list);	// free t_command and myenv (1st call) ; free t_command, myenv, buffer (2e call)
@@ -221,7 +222,6 @@ int	main(int argc, char **argv, char **env)
 	int			c;
 	int			ret;
 
-	signal(SIGQUIT, &nothing_sigquit);
 	c = 0;
 	if (argc == 3 && argv[1][0] == '-' && argv[1][1] == 'c')
 		c = 1;

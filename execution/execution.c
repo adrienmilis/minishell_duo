@@ -37,10 +37,12 @@ int	option_n(char *arg)
 	return (1);
 }
 
-int	builtin_echo(char **arg, int pid, int *backslash)
+int	builtin_echo(char **arg, int pid)
 {
+	int	nonl;
 	int	option_string;
 
+	nonl = 0;
 	option_string = 1;
 	if (pid == 0)
 	{
@@ -49,7 +51,7 @@ int	builtin_echo(char **arg, int pid, int *backslash)
 			if (option_string && !ft_strcmp("-", *arg))
 				option_string = 0;
 			else if (option_string && option_n(*arg))
-				*backslash = 0;
+				nonl = 1;
 			else
 			{
 				option_string = 0;
@@ -59,6 +61,8 @@ int	builtin_echo(char **arg, int pid, int *backslash)
 			}
 			arg++;
 		}
+		if (!nonl)
+			write(1, "\n", 1);
 	}
 	return (1);
 }
@@ -93,9 +97,9 @@ int	builtin_cd(char **arg, int pid, int pipes)
 				write(2, "minishell: cd: ", 15);
 				write(2, *arg, ft_strlen(*arg));
 				if (errno == ENOENT)
-					write(2, ": No such file or directory", 27);
+					write(2, ": No such file or directory\n", 28);
 				if (errno == EACCES)
-					write(2, ": Permission denied", 19);
+					write(2, ": Permission denied\n", 20);
 			}
 			else
 			{
@@ -121,6 +125,7 @@ int	builtin_pwd(int pid)
 		if (!pwd)
 			exit(0); //
 		write(1, pwd, ft_strlen(pwd));
+		write(1, "\n", 1);
 		free(pwd);
 	}
 	return (1);
@@ -164,8 +169,7 @@ int	builtin_export(char **arg, int pid, int pipes)
 				export_print_env(mygetenv(myenv, copy_myenv[i]));
 				write(1, "\"", 1);
 			}
-			if (copy_myenv[i + 1])
-				write(1, "\n", 1);
+			write(1, "\n", 1);
 			i++;
 		}
 		free_strtab(copy_myenv);
@@ -188,7 +192,7 @@ int	builtin_export(char **arg, int pid, int pipes)
 			{
 				write(2, "minishell: export: `", 20);
 				write(2, *arg, ft_strlen(*arg));
-				write(2, "\': not a valid identifier", 25);
+				write(2, "\': not a valid identifier\n", 26);
 			}
 			arg++;
 		}
@@ -215,7 +219,7 @@ int	builtin_unset(char **arg, int pid, int pipes)
 			{
 				write(2, "minishell: unset: `", 19);
 				write(2, *arg, ft_strlen(*arg));
-				write(2, "\': not a valid identifier", 25);
+				write(2, "\': not a valid identifier\n", 26);
 			}
 			arg++;
 		}
@@ -239,8 +243,7 @@ int	builtin_env(int pid)
 			if (var_has_value(myenv[i]))
 			{
 				write(1, myenv[i], ft_strlen(myenv[i]));
-				if (myenv[i + 1])
-					write(1, "\n", 1);
+				write(1, "\n", 1);
 			}
 			i++;
 		}
@@ -304,13 +307,13 @@ int	builtin_exit(char **arg, int pid, int pipes)
 			{
 				write(2, "minishell: exit: ", 17);
 				write(2, *arg, ft_strlen(*arg));
-				write(2, ": numeric argument required", 27);
+				write(2, ": numeric argument required\n", 28);
 				exit(255);
 			}
 			else
 			{
 				if (*(arg + 1))
-					write(2, "minishell: exit: too many arguments", 35);
+					write(2, "minishell: exit: too many arguments\n", 36);
 				if (!*(arg + 1))
 					exit(ft_atoi(*arg));
 			}
@@ -323,10 +326,10 @@ int	builtin_exit(char **arg, int pid, int pipes)
 	return (1);
 }
 
-int	do_builtin(char **cmd, int pid, int pipes, int *backslash) // faire un strcmp qui decaps
+int	do_builtin(char **cmd, int pid, int pipes) // faire un strcmp qui decaps
 {
 	if (!ft_strcmp("echo", cmd[0]))
-		return (builtin_echo(cmd + 1, pid, backslash));
+		return (builtin_echo(cmd + 1, pid));
 	else if (!ft_strcmp("cd", cmd[0]))
 		return (builtin_cd(cmd + 1, pid, pipes));
 	else if (!ft_strcmp("pwd", cmd[0]))
@@ -367,7 +370,7 @@ int	no_permission(char *cmd)
 {
 	write(2, "minishell: ", 11);
 	write(2, cmd, ft_strlen(cmd));
-	write(2, ": Permission denied", 19);
+	write(2, ": Permission denied\n", 20);
 	exit(126);
 }
 
@@ -380,7 +383,7 @@ void	stat_check(char *cmd)
 	{
 		write(2, "minishell: ", 11);
 		write(2, cmd, ft_strlen(cmd));
-		write(2, ": is a directory", 16);
+		write(2, ": is a directory\n", 17);
 		exit(126);
 	}
 	else if (S_ISREG(buf.st_mode) && ft_strchr(cmd, '/'))
@@ -432,15 +435,32 @@ void	launch_executable(char **cmd)
 	write(2, "minishell: ", 11);
 	write(2, cmd0, ft_strlen(cmd0));
 	if (!ft_strchr(cmd0, '/'))
-		write(2, ": command not found", 19);
+		write(2, ": command not found\n", 20);
 	else
-		write(2, ": No such file or directory", 27);
+		write(2, ": No such file or directory\n", 28);
 	exit(127);
 }
 
-void	nothing_sigint(int sig)
+int		ctrl_execution(int new_value)
 {
-	(void)sig;
+	static int	b;
+	int			ret;
+
+	ret = b;
+	if (new_value >= 0)
+		b = new_value;
+	return (ret);
+}
+
+void	handler_signal_execution(int sig)
+{
+	if (sig == SIGINT)
+		ctrl_execution(130);
+	else if (sig == SIGQUIT)
+	{
+		ctrl_execution(131);
+		write(1, "Quit: 3", 7);
+	}
 	return ;
 }
 
@@ -473,19 +493,20 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 	int	pipes;
 	int	status;
 
-	*backslash = 1;
+	*backslash = 0;
 	firstcmd = 1;
 	pipes = 0;
 	if (pipe_cmd->next)
 		pipes = 1;
 	canonical_mode(1);
-	while (pipe_cmd)
+	while (pipe_cmd && !ctrl_execution(-1))
 	{
 		//printf("----\n%s\n----\n", pipe_cmd->cmd[0]);
 		pipefd[0][0] = pipefd[1][0];
 		pipefd[0][1] = pipefd[1][1];
 		pipe(pipefd[1]);
-		signal(SIGINT, &nothing_sigint);
+		signal(SIGINT, &handler_signal_execution);
+		signal(SIGQUIT, &handler_signal_execution);
 		pid = fork();
 		if (pid == 0)
 		{
@@ -517,7 +538,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 			close(pipefd[0][1]);
 		}
 		if (is_builtin(pipe_cmd->cmd))
-			do_builtin(pipe_cmd->cmd, pid, pipes, backslash);
+			do_builtin(pipe_cmd->cmd, pid, pipes);
 		else if (pid == 0)
 			launch_executable(pipe_cmd->cmd);
 		if (pid == 0)
@@ -531,6 +552,12 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 		status = WEXITSTATUS(status);
 		free(myenv[0]);
 		myenv[0] = itoa_env_var("?=", status);
+	}
+	if (ctrl_execution(-1))
+	{
+		free(myenv[0]);
+		myenv[0] = itoa_env_var("?=", ctrl_execution(0));
+		*backslash = 1;
 	}
 	close(pipefd[1][0]);
 	close(pipefd[1][1]);
