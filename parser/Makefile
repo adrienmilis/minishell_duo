@@ -47,7 +47,6 @@ $(OBJS): $(SRCS)
 
 $(NAME): $(OBJS)
 	ar rc $(NAME) $(OBJS)
-	ranlib $(NAME)
 
 clean:
 	rm -rf $(OBJS)

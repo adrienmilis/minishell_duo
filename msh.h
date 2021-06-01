@@ -28,10 +28,11 @@ int			init_termcap();
 void		shlvl();
 char		*make_buffer(char *buf, char c);
 void		c_option(char *argv2);
-void		del_char_buffer(char **buffer, int *in_history);
+void		del_char_buffer(char **buffer, t_command *begin_list);
 void		ft_putstr(char *str);
 
 // list_utils.c
+int			pointer_in_history(char *buffer, t_command *begin_list);
 t_command	*new_elem_history(char *str);
 void		ft_lstadd_front(t_command **begin_list, t_command *new_elem);
 void		print_list_history(t_command *begin_list);		// pas utile

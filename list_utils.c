@@ -1,5 +1,23 @@
 #include "msh.h"
 
+int	pointer_in_history(char *buffer, t_command *begin_list)
+{
+	t_command	*elem;
+
+	if (!begin_list)
+		return (0);
+	if (!buffer)
+		return (0);
+	elem = begin_list;
+	while (elem)
+	{
+		if (buffer == elem->command)
+			return (1);
+		elem = elem->next;
+	}
+	return (0);
+}
+
 t_command	*new_elem_history(char *str)
 {
 	t_command	*new_elem;

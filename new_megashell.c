@@ -34,7 +34,7 @@ void	c_option(char *argv2)
 	t_pipe_cmd	*pipe_cmd;
 
 	pipe_cmd = parser(argv2, 1);
-	while (pipe_cmd /*&& pipe_cmd->cmd*/)
+	while (pipe_cmd)
 	{
 		if (pipe_cmd->cmd)
 			exec_pipe_cmd(pipe_cmd);
@@ -51,49 +51,44 @@ void	func(void)
 	tputs(tgetstr("dc", NULL), 1, ft_putchar);
 }
 
-void	write_history_command(t_command *elem, char **buffer, int up)
+void	write_history_command(t_command *elem, char **buffer, int up, t_command *beg_list)
 {
-	char	*tmp;
+	// char	*tmp;
 
-	// printf("*buffer : [%s]\n", *buffer);
 	int len = ft_strlen(*buffer);
 	while (len > 0)
 	{
 		func();
 		len--;
-		// del_char_buffer(buffer);	
 	}
-	if (up)
+	if (!pointer_in_history(*buffer, beg_list) && *buffer)
 	{
-		if (elem->command)
+		free(*buffer);
+		*buffer = NULL;
+	}
+	// if (up)
+	// {
+		if ((!up && elem) || (up && elem->command))
 		{
-			tmp = *buffer;
 			*buffer = elem->command;
-			// free(tmp);
 			ft_putstr(elem->command);
 		}
 		else
-		{
 			*buffer = NULL;
-		}
-	}
-	else
-	{
-		if (elem)
-		{
-			tmp = *buffer;
-			*buffer = elem->command;
-			// free(tmp);
-			ft_putstr(elem->command);
-		}
-		else
-		{
-			*buffer = NULL;
-		}
-	}
+	// }
+	// else
+	// {
+	// 	if (elem)
+	// 	{
+	// 		*buffer = elem->command;
+	// 		ft_putstr(elem->command);
+	// 	}
+	// 	else
+	// 		*buffer = NULL;
+	// }
 }
 
-void	updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer, int *in_history)
+void	updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer)
 {
 	static t_command	*elem;
 
@@ -108,19 +103,15 @@ void	updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer, int 
 			elem = beg_list;
 		else if (elem->next != NULL)
 			elem = elem->next;
-		*in_history = 1;
-		write_history_command(elem, buffer, 1);
+		write_history_command(elem, buffer, 1, beg_list);
 	}
 	if (rd[2] == 66) // down arrow
 	{
 		if (elem == NULL || elem == beg_list)
-		{
 			elem = NULL;
-			*in_history = 0;
-		}
 		else
 			elem = elem->prev;
-		write_history_command(elem, buffer, 0);
+		write_history_command(elem, buffer, 0, beg_list);
 	}
 }
 
@@ -157,7 +148,6 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
 	char		rd[4];
 	int			ret;
 	static int	reset;
-	static int	in_history;
 
 	if (c)
 		c_option(argv2);
@@ -180,11 +170,11 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
 			printf("RAJOUTER ERREUR");
 	}
 	else if (rd[0] == '\033')
-		updown_event(&reset, rd, *begin_list, buffer, &in_history);
+		updown_event(&reset, rd, *begin_list, buffer);
 	else if (rd[0] == 127)
 	{
 		if (ft_strlen(*buffer) > 0)
-			del_char_buffer(buffer, &in_history);
+			del_char_buffer(buffer, *begin_list);
 	}
 	else if (rd[0] == 10)
 	{
