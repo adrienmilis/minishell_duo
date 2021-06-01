@@ -6,6 +6,9 @@
 # include <fcntl.h>
 # include <sys/stat.h>
 # include <errno.h>
+# include <termios.h>
+# include <curses.h>
+# include <term.h>
 
 char	**myenv;
 

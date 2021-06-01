@@ -448,6 +448,26 @@ void	nothing_sigint(int sig)
 	return ;
 }
 
+void	canonical_mode(int set)
+{
+	struct termios	s_termios;
+
+	if (tcgetattr(0, &s_termios) == -1)
+		return ;
+	if (set)
+	{
+		s_termios.c_lflag |= ICANON;
+		s_termios.c_lflag |= ECHO;
+	}
+	else
+	{
+		s_termios.c_lflag &= ~(ICANON);
+		s_termios.c_lflag &= ~(ECHO);
+	}
+	if (tcsetattr(0, 0, &s_termios) == -1)
+		return ;
+}
+
 void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd)
 {
 	int	pipefd[2][2];
@@ -461,6 +481,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd)
 	pipes = 0;
 	if (pipe_cmd->next)
 		pipes = 1;
+	canonical_mode(1);
 	while (pipe_cmd)
 	{
 		//printf("----\n%s\n----\n", pipe_cmd->cmd[0]);
@@ -516,4 +537,5 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd)
 	}
 	close(pipefd[1][0]);
 	close(pipefd[1][1]);
+	canonical_mode(0);
 }
