@@ -197,6 +197,7 @@ char	**rm_env_var(char **env, char *var)
 		i++;
 	}
 	res[j] = NULL;
+	free_strtab(env);
 	return (res);
 }
 
