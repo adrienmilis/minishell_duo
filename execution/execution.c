@@ -510,9 +510,8 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 	if (pipe_cmd->next)
 		pipes = 1;
 	canonical_mode(1);
-	while (pipe_cmd && !ctrl_execution(-1))
+	while (pipe_cmd && !ctrl_execution(-1) && (pipe_cmd->cmd || pipe_cmd->input))
 	{
-		//printf("----\n%s\n----\n", pipe_cmd->cmd[0]);
 		pipefd[0][0] = pipefd[1][0];
 		pipefd[0][1] = pipefd[1][1];
 		pipe(pipefd[1]);
@@ -550,10 +549,13 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 			close(pipefd[0][0]);
 			close(pipefd[0][1]);
 		}
-		if (is_builtin(pipe_cmd->cmd))
-			do_builtin(pipe_cmd->cmd, pid, pipes);
-		else if (pid == 0)
-			launch_executable(pipe_cmd->cmd);
+		if (pipe_cmd->cmd)
+		{
+			if (is_builtin(pipe_cmd->cmd))
+				do_builtin(pipe_cmd->cmd, pid, pipes);
+			else if (pid == 0)
+				launch_executable(pipe_cmd->cmd);
+		}
 		if (pid == 0)
 			exit(0); // pid == 0 exit(0); ici ou dans les builtin ?
 		waitpid(pid, &status, 0);
