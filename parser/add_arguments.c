@@ -39,7 +39,7 @@ void	add_argument(char *word, t_pipe_cmd *p_begin)
 	add_argument2(new_args, i, word, last);
 }
 
-int	append_arg(t_pipe_cmd *last, char *word, char *tmp)	// proteger le retour
+int	append_arg(t_pipe_cmd *last, char *word, char *tmp)
 {
 	char	*cat_arg;
 	int		i;
@@ -91,7 +91,7 @@ char	*copy_next_word(char *cmd, t_pars *p, int wd_size, t_pipe_cmd *p_start)
 	return (word);
 }
 
-char	*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start)	// renvoie NULL si on n'a rien trouve (mauvaise $var)
+char	*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start)
 {
 	char	*word;
 	int		j;
@@ -109,7 +109,7 @@ char	*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start)	// renvoie NU
 	j = p->i;
 	while (!is_r_space(&cmd[j], j)
 		&& !is_r_resvd_char(&cmd[j], j, 1)
-		&& !is_r_quote(&cmd[j], j) && cmd[j])	// et cmd[j] ?? 
+		&& !is_r_quote(&cmd[j], j) && cmd[j])
 	{
 		if (!is_unesc_char(&cmd[j], j))
 			escaped++;

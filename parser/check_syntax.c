@@ -31,12 +31,12 @@ int	semicolons_valid(char *cmd)
 	while (cmd[++i])
 	{
 		set_quotes(i, cmd, &p);
-		if (no_semicolon == 1 && cmd[i] == ';' && (i == 0 || cmd[i - 1] != '\\')
+		if (no_semicolon == 1 && is_unesc_char(&cmd[i], i) && cmd[i] == ';'
 			&& p.in_d_quotes == 0 && p.in_s_quotes == 0)
 			return (0);
 		if (!is_space(cmd[i]) && cmd[i] != ';')
 			no_semicolon = 0;
-		if (cmd[i] == ';' && (i == 0 || cmd[i - 1] != '\\'))
+		if (is_unesc_char(&cmd[i], i) && cmd[i] == ';')
 			no_semicolon = 1;
 		if (cmd[i] == '|' || cmd[i] == '>' || cmd[i] == '<')
 			no_semicolon = 1;
@@ -67,15 +67,6 @@ int	pipes_valid(char *cmd)
 			no_pipe = 1;
 	}
 	return (1);
-}
-
-void	set_exit_status(char *error, int status)
-{
-	ft_putstr("minishell: ");
-	ft_putstr(error);
-	ft_putstr("\n");
-	free(myenv[0]);
-	myenv[0] = itoa_env_var("?=", status);
 }
 
 int	are_quotes_closed(char *cmd)

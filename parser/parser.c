@@ -5,11 +5,11 @@ t_pipe_cmd	*parser(char *cmd, int new_command)
 	t_pipe_cmd		*p_cmd_start;
 	static t_pars	p;
 
-	if (!cmd || !cmd[0] || !check_syntax(cmd) || !cmd[p.i])
+	if (!cmd || !cmd[0] || !check_syntax(cmd))
 		return (NULL);
 	init_pars_struct(&p, new_command, cmd[0]);
-	// if (!cmd[p.i])
-	// 	return (NULL);
+	if (!cmd[p.i])
+		return (NULL);
 	p_cmd_start = init_pipe_list();
 	while (!p.semicolon && cmd[p.i])
 	{

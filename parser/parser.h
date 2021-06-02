@@ -31,6 +31,7 @@ typedef struct s_pars
 void	ft_putstr(char *str);
 
 // errors.c
+void	set_exit_status(char *error, int status);
 void	free_pipe_elems(t_pipe_cmd *c);
 void	free_pipe_cmd(t_pipe_cmd *begin_list);
 void	error_exit(char *msg, t_pipe_cmd *begin_list);

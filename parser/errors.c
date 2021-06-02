@@ -1,5 +1,14 @@
 #include "parser.h"
 
+void	set_exit_status(char *error, int status)
+{
+	ft_putstr("minishell: ");
+	ft_putstr(error);
+	ft_putstr("\n");
+	free(myenv[0]);
+	myenv[0] = itoa_env_var("?=", status);
+}
+
 void	free_pipe_elems(t_pipe_cmd *c)
 {
 	int	i;
