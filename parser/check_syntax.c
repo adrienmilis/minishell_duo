@@ -44,6 +44,17 @@ int	semicolons_valid(char *cmd)
 	return (1);
 }
 
+int	pipe_is_last_char(char *cmd, int i)
+{
+	while (cmd[i])
+	{
+		if (!is_space(cmd[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 int	pipes_valid(char *cmd)
 {
 	int		no_pipe;
@@ -61,8 +72,12 @@ int	pipes_valid(char *cmd)
 			return (0);
 		if (!is_space(cmd[i]) && cmd[i] != '|')
 			no_pipe = 0;
-		if (cmd[i] == '|' && (i == 0 || cmd[i - 1] != '\\'))
+		if (cmd[i] == '|' && is_unesc_char(&cmd[i], i))
+		{
+			if (pipe_is_last_char(cmd, i + 1))
+				return (0);
 			no_pipe = 1;
+		}
 		if (cmd[i] == ';' || cmd[i] == '>' || cmd[i] == '<')
 			no_pipe = 1;
 	}
