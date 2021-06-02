@@ -41,6 +41,7 @@ int	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign)
 	word = get_redir_word(cmd, p, p_begin);
 	if ((!word && p->var_not_exist) || (word && space_middle_of_word(word) && p->word_from_variable))
 	{
+		free(word);
 		set_exit_status("ambiguous redirect", 1);
 		return (0);			
 	}
@@ -185,6 +186,7 @@ void	argument_w_spaces(char *word, int append, t_pipe_cmd *p_begin, t_pars *p)
 			add_argument(new_word, p_begin);
 		new_word = make_word(word, p_begin, p);
 	}
+	free(word);
 }
 
 int	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)

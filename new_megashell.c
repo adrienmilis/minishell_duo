@@ -32,13 +32,15 @@ void	c_option(char *argv2)
 	pipe_cmd = parser(argv2, 1);
 	while (pipe_cmd)
 	{
-		if (pipe_cmd->cmd)
+		if (pipe_cmd->cmd || pipe_cmd->input)
 			exec_pipe_cmd(pipe_cmd, &backslash);
 		free_pipe_cmd(pipe_cmd);
 		pipe_cmd = parser(argv2, 0);
 	}
 	free_pipe_cmd(pipe_cmd);
-	exit(ft_atoi(mygetenv(myenv, "?")));
+	int ret = ft_atoi(mygetenv(myenv, "?"));
+	free_strtab(myenv);
+	exit(ret);
 }
 
 void	func(void)
