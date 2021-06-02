@@ -6,7 +6,7 @@
 /*   By: hmesnard <hmesnard@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:08:43 by hmesnard          #+#    #+#             */
-/*   Updated: 2021/05/26 11:55:37 by hmesnard         ###   ########.fr       */
+/*   Updated: 2021/06/02 19:48:15 by hmesnard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,11 @@ static int	nb_mots(const char *str, char c)
 	nbmots = 0;
 	while (str[i])
 	{
-		while (str[i] == c)
-			i++;
-		if (!(str[i] == c) && str[i] != 0)
-		{
-			while (!(str[i] == c) && str[i] != 0)
-				i++;
+		if (str[i] == c)
 			nbmots++;
-		}
+		i++;
 	}
+	nbmots++;
 	return (nbmots);
 }
 
@@ -41,23 +37,22 @@ static int	malloc_mots(const char *str, char c, char **res)
 
 	i = 0;
 	mot = 0;
+	nblettres = 0;
 	while (str[i])
 	{
-		while (str[i] == c)
-			i++;
-		if (!(str[i] == c) && str[i] != 0)
+		if (str[i] == c)
 		{
-			nblettres = 0;
-			while (!(str[i] == c) && str[i] != 0)
-			{
-				nblettres++;
-				i++;
-			}
 			if (!(res[mot] = malloc((nblettres + 1) * sizeof(char))))
 				return (0);
+			nblettres = 0;
 			mot++;
 		}
+		else
+			nblettres++;
+		i++;
 	}
+	if (!(res[mot] = malloc((nblettres + 1) * sizeof(char))))
+		return (0);
 	return (1);
 }
 
@@ -69,23 +64,20 @@ static void	fill_res(const char *str, char c, char **res)
 
 	i = 0;
 	mot = 0;
+	lettre = 0;
 	while (str[i])
 	{
-		while (str[i] == c)
-			i++;
-		if (!(str[i] == c) && str[i] != 0)
+		if (str[i] == c)
 		{
-			lettre = 0;
-			while (!(str[i] == c) && str[i] != 0)
-			{
-				res[mot][lettre] = str[i];
-				lettre++;
-				i++;
-			}
 			res[mot][lettre] = 0;
+			lettre = 0;
 			mot++;
 		}
+		else
+			res[mot][lettre++] = str[i];
+		i++;
 	}
+	res[mot][lettre] = 0;
 }
 
 static void	free_res(char **res)

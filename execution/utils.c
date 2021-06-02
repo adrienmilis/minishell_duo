@@ -6,7 +6,7 @@
 /*   By: hmesnard <hmesnard@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:09:09 by hmesnard          #+#    #+#             */
-/*   Updated: 2021/05/27 15:04:57 by hmesnard         ###   ########.fr       */
+/*   Updated: 2021/06/02 19:24:26 by hmesnard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ char	*ft_strjoin(char const *s1, char const *s2, char c)
 
 	if (!s1 || !s2)
 		return (NULL);
+	if (s1[0] == '\0')
+		return (ft_strjoin(".", s2, c));
 	lens1 = ft_strlen(s1);
 	if (!(res = malloc((lens1 + ft_strlen(s2) + 1 + 1) * sizeof(char))))
 		return (NULL);

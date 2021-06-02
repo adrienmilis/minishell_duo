@@ -412,7 +412,7 @@ void	launch_executable(char **cmd)
 		if (!PATH_split)
 			return ;
 	}
-	/*if (ft_strchr(cmd[0], '/'))*/
+	if (ft_strchr(cmd[0], '/') || !(PATH_value && PATH_value[0]))
 		execve(cmd[0], cmd, myenv + 1);
 	if (errno == EACCES && ft_strchr(cmd[0], '/'))
 		stat_check(cmd[0]);
