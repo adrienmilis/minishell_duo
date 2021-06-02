@@ -28,7 +28,15 @@ typedef struct s_pars
 	int	var_not_exist;
 }				t_pars;
 
+typedef struct s_command
+{
+	char				*command;
+	struct s_command	*prev;
+	struct s_command	*next;
+}				t_command;
+
 void	ft_putstr(char *str);
+void	error_free(char *buffer, t_command *begin_list);
 
 // errors.c
 void	set_exit_status(char *error, int status);
@@ -50,9 +58,8 @@ char	*make_dquotes_arg(t_pars *p, char *cmd, t_pipe_cmd *p_begin);
 char	*arg_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, int r);
 void	in_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd);
 
-
 // parser.c
-t_pipe_cmd	*parser(char *cmd, int new_command);
+t_pipe_cmd	*parser(char *cmd, int new_command, char *buffer, t_command *b_list);
 
 // add_arguments.c
 void		add_argument2(char **new_args, int i, char *word, t_pipe_cmd *last);
@@ -62,17 +69,16 @@ char		*copy_next_word(char *cmd, t_pars *p, int word_size, t_pipe_cmd *p_cmd_sta
 char		*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start);
 
 // utils.c
+void 		set_quotes(int i, char *cmd, t_pars *p);
 t_pipe_cmd	*init_pipe_list();
 void		init_pars_struct(t_pars *p, int new_command, char c);
 void		reset_pars_struct(t_pars *p);
 
 // check_syntax.c
-void 	set_quotes(int i, char *cmd, t_pars *p);
 int		semicolons_valid(char *cmd);
 int		pipes_valid(char *cmd);
 int		are_quotes_closed(char *cmd);
 int		check_syntax(char *cmd);
-void	set_exit_status(char *error, int status);
 
 // check_chars.c
 int		is_space(char c);

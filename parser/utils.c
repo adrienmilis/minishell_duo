@@ -52,24 +52,21 @@ void	reset_pars_struct(t_pars *p)
 	p->var_not_exist = 0;
 }
 
-/*void	set_quotes(t_pars *p, char c0, char c1)
+void	set_quotes(int i, char *cmd, t_pars *p)
 {
-	// si on est a la pos 0, c[0] = 0
-	if (p->in_s_quotes == 0 && p->in_d_quotes == 0)
+	if (!p->in_s_quotes && !p->in_d_quotes)
 	{
-		if (c1 == '\'' && c0 != '\\')
+		if (is_unesc_simple(&cmd[i], i))
 			p->in_s_quotes = 1;
-		else if (c1 == '\"' && c0 != '\\')
-			p->in_d_quotes = 0;
+		else if (is_unesc_double(&cmd[i], i))
+			p->in_d_quotes = 1;
 	}
-	else if (p->in_s_quotes == 1)
+	else if (p->in_s_quotes && !p->in_d_quotes)
 	{
-		if (c1 == '\'' && c0 != '\\')
+		if (cmd[i] == '\'')
 			p->in_s_quotes = 0;
 	}
-	else if (p->in_d_quotes == 1)
-	{
-		if (c1 == '\"' && c0 != '\\')
+	else if (!p->in_s_quotes && p->in_d_quotes)
+		if (is_unesc_double(&cmd[i], i))
 			p->in_d_quotes = 0;
-	}
-}*/
+}

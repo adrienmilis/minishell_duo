@@ -1,6 +1,6 @@
 #include "parser.h"
 
-t_pipe_cmd	*parser(char *cmd, int new_command)
+t_pipe_cmd	*parser(char *cmd, int new_command, char *buffer, t_command *b_list)
 {
 	t_pipe_cmd		*p_cmd_start;
 	static t_pars	p;
@@ -11,6 +11,8 @@ t_pipe_cmd	*parser(char *cmd, int new_command)
 	if (!cmd[p.i])
 		return (NULL);
 	p_cmd_start = init_pipe_list();
+	if (!p_cmd_start)
+		error_free(buffer, b_list);	// est-ce qu'on garde comme ca ?
 	while (!p.semicolon && cmd[p.i])
 	{
 		if (!p.in_d_quotes && !p.in_s_quotes)
