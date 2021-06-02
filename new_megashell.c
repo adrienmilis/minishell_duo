@@ -106,7 +106,7 @@ int	enter_event(char **buffer, t_command **begin_list)
 	t_command	*new_elem;
 	int			backslash;
 
-	backslash = 1;
+	backslash = 0;
 	write(1, "\n", 1);
 	pipe_cmd = parser(*buffer, 1);
 	if (pipe_cmd == NULL)
@@ -118,7 +118,7 @@ int	enter_event(char **buffer, t_command **begin_list)
 	}
 	while (pipe_cmd)
 	{
-		if (pipe_cmd->cmd)
+		if (pipe_cmd->cmd || pipe_cmd->input)
 			exec_pipe_cmd(pipe_cmd, &backslash);	// free pipe_cmd on exit
 		free_pipe_cmd(pipe_cmd);
 		pipe_cmd = parser(*buffer, 0);
