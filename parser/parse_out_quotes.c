@@ -51,8 +51,6 @@ int	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign)
 		{
 			set_exit_status("syntax error near unexpected token `>'", 2);
 			return (0);
-			// free ?
-			// error_exit("syntax error near unexpected token `>'", p_begin); // pas de leak si on exit sans free word ??
 		}
 		if (last->output)
 			free(last->output);
@@ -69,7 +67,6 @@ int	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign)
 		{
 			set_exit_status("syntax error near unexpected token `<'", 2);
 			return (0);
-			// error_exit("syntax error near unexpected token `<'", p_begin); // pas de leak si on exit sans free word ??
 		}
 		if (last->input)
 			free(last->input);

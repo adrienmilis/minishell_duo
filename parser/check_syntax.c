@@ -1,24 +1,5 @@
 #include "parser.h"
 
-void	set_quotes(int i, char *cmd, t_pars *p)
-{
-	if (!p->in_s_quotes && !p->in_d_quotes)
-	{
-		if (is_unesc_simple(&cmd[i], i))
-			p->in_s_quotes = 1;
-		else if (is_unesc_double(&cmd[i], i))
-			p->in_d_quotes = 1;
-	}
-	else if (p->in_s_quotes && !p->in_d_quotes)
-	{
-		if (cmd[i] == '\'')
-			p->in_s_quotes = 0;
-	}
-	else if (!p->in_s_quotes && p->in_d_quotes)
-		if (is_unesc_double(&cmd[i], i))
-			p->in_d_quotes = 0;
-}
-
 int	semicolons_valid(char *cmd)
 {
 	int		no_semicolon;

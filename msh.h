@@ -7,8 +7,6 @@
 #include <string.h>
 #include "execution/execution.h"
 
-// int	in_history;
-
 typedef struct s_command
 {
 	char				*command;
@@ -19,7 +17,7 @@ typedef struct s_command
 // parsing
 void		free_pipe_elems(t_pipe_cmd *c);
 void		free_pipe_cmd(t_pipe_cmd *begin_list);
-t_pipe_cmd	*parser(char *cmd, int mew_command);	// ajouter a execution.h
+t_pipe_cmd	*parser(char *cmd, int new_command, char *buffer, t_command *b_list);	// ajouter a execution.h
 int			ft_putchar(int c);
 
 // minishell_utils.c
