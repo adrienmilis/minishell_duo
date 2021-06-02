@@ -484,6 +484,17 @@ void	canonical_mode(int set)
 		return ;
 }
 
+void	error_input(char *input)
+{
+	write(2, "minishell: ", 11);
+	write(2, input, ft_strlen(input));
+	if (errno == EACCES)
+		write(2, ": Permission denied\n", 20);
+	else if (errno == ENOENT)
+		write(2, ": No such file or directory\n", 28);
+	exit(1);
+}
+
 void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 {
 	int	pipefd[2][2];
@@ -515,6 +526,8 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 			else if (pipe_cmd->input)
 			{
 				filefd[0] = open(pipe_cmd->input, O_RDONLY);
+				if (filefd[0] == -1)
+					error_input(pipe_cmd->input);
 				dup2(filefd[0], STDIN_FILENO);
 				close(filefd[0]);
 			}
