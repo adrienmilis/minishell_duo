@@ -128,7 +128,7 @@ int	enter_event(char **buffer, t_command **begin_list)
 	if (!new_elem)
 		error_free(*buffer, *begin_list);	// buffer if exists, t_command
 	ft_lstadd_front(begin_list, new_elem);
-	free(*buffer);
+	// free(*buffer);
 	*buffer = NULL;
 	if (backslash)
 		write(1, "\n", 1);
