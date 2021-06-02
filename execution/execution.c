@@ -406,20 +406,21 @@ void	launch_executable(char **cmd)
 		return ;
 	PATH_value = mygetenv(myenv, "PATH");
 	PATH_split = NULL;
-	if (PATH_value)
+	if (PATH_value && PATH_value[0])
 	{
 		PATH_split = ft_split(PATH_value, ':');
 		if (!PATH_split)
 			return ;
 	}
-	execve(cmd[0], cmd, myenv + 1);
+	/*if (ft_strchr(cmd[0], '/'))*/
+		execve(cmd[0], cmd, myenv + 1);
 	if (errno == EACCES && ft_strchr(cmd[0], '/'))
 		stat_check(cmd[0]);
 	cmd0 = cmd[0];
-	if (PATH_value && PATH_split[0])
+	if (PATH_value && PATH_value[0] && PATH_split[0])
 		cmd[0] = ft_strjoin(PATH_split[0], cmd0, '/');
 	i = 1;
-	if (PATH_value)
+	if (PATH_value && PATH_value[0])
 	{
 		while (execve(cmd[0], cmd, myenv + 1) == -1 && PATH_split[i])
 		{
@@ -434,7 +435,7 @@ void	launch_executable(char **cmd)
 	stat_check(cmd0);
 	write(2, "minishell: ", 11);
 	write(2, cmd0, ft_strlen(cmd0));
-	if (!ft_strchr(cmd0, '/'))
+	if (!ft_strchr(cmd0, '/') && PATH_value && PATH_value[0])
 		write(2, ": command not found\n", 20);
 	else
 		write(2, ": No such file or directory\n", 28);
