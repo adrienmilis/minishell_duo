@@ -56,7 +56,7 @@ int	pipes_valid(char *cmd)
 	while (cmd[++i])
 	{
 		set_quotes(i, cmd, &p);
-		if (no_pipe == 1 && cmd[i] == '|' && (i == 0 || cmd[i - 1] != '\\')
+		if (no_pipe == 1 && cmd[i] == '|' && is_unesc_char(&cmd[i], i)
 			&& p.in_d_quotes == 0 && p.in_s_quotes == 0)
 			return (0);
 		if (!is_space(cmd[i]) && cmd[i] != '|')

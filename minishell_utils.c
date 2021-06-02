@@ -78,7 +78,7 @@ int	shlvl()
 	return (1);
 }
 
-char	*make_buffer(char *buf, char c)
+char	*make_buffer(char *buf, char c, t_command *begin_list)
 {
 	char	*buf_cpy;
 	int		buf_len;
@@ -99,6 +99,7 @@ char	*make_buffer(char *buf, char c)
 	}
 	buf_cpy[i] = c;
 	buf_cpy[i + 1] = '\0';
+	if (!pointer_in_history(buf, begin_list))
 	free(buf);
 	return (buf_cpy);
 }

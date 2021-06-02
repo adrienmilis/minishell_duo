@@ -158,7 +158,7 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)	// plu
 	if (ft_isprint(rd[0]))
 	{
 		write(1, &rd[0], 1);
-		*buffer = make_buffer(*buffer, rd[0]);
+		*buffer = make_buffer(*buffer, rd[0], *begin_list);
 		if (*buffer == NULL)
 			error_free(*buffer, *begin_list);	// free t_command and myenv (old buffer is already freed)
 	}
