@@ -86,7 +86,7 @@ void	updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer)
 	{
 		if (elem == NULL)
 			elem = beg_list;
-		else if (elem->next != NULL)
+		else if (elem->next->next != NULL)
 			elem = elem->next;
 		write_history_command(elem, buffer, 1, beg_list);
 	}
