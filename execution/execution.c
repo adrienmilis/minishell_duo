@@ -372,6 +372,7 @@ void	stat_check(char *cmd)
 {
 	struct stat	buf;
 
+	ft_memset(&buf, 0, sizeof(struct stat));
 	stat(cmd, &buf);
 	if (S_ISDIR(buf.st_mode) && ft_strchr(cmd, '/'))
 	{
