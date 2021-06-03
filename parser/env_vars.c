@@ -75,7 +75,10 @@ char	*valid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_cmd_start)
 char	*get_variable(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
 {
 	char	*word;
+	static int	r_space;
 
+	if (is_r_space(&cmd[p->i - 1], p->i - 1))
+		r_space = 1;
 	p->i += 1;
 	if (is_number(cmd[p->i]))
 	{
@@ -86,7 +89,9 @@ char	*get_variable(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
 		word = unvalid_var_name(p, cmd, p_begin);
 	else
 		word = valid_var_name(p, cmd, p_begin);
-	if (word == NULL)
+	if (word == NULL && r_space)
 		p->var_not_exist = 1;
+	if (word)
+		r_space = 0;
 	return (word);
 }
