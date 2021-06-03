@@ -21,13 +21,20 @@ typedef struct			s_pipe_cmd
 	struct s_pipe_cmd	*next;
 }						t_pipe_cmd;
 
-/*typedef struct			s_command
+typedef struct s_command
 {
-	t_pipe_cmd			*pipe_cmd_start; // début de la liste chainee de pipe cmds
+	char				*command;
+	struct s_command	*prev;
 	struct s_command	*next;
-}						t_command;*/
+}				t_command;
 
-void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash);
+typedef struct	s_PATH
+{
+	char	*value;
+	char	**split;
+}				t_PATH;
+
+void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash, t_command *begin_list);
 
 size_t	strlen_env_var(char *var);
 int		strcmp_env(const char *s1, const char *s2);
@@ -59,5 +66,8 @@ void	*ft_memmove(void *dest, const void *src, size_t n);
 void	ft_putnbr_fd(int n, int fd);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 void	*ft_memset(void *s, int c, size_t n);
+
+void	free_pipe_cmd(t_pipe_cmd *begin_list);
+void		free_list(t_command	*begin_list);
 
 #endif
