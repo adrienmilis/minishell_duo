@@ -93,9 +93,7 @@ int	real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 			last->double_greater = 0;
 	}
 	p->i += 1;
-	if (!(real_sign2(p, p_cmd_start, cmd, sign)))
-		return (0);
-	return (1);
+	return (real_sign2(p, p_cmd_start, cmd, sign));
 }
 
 int	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
@@ -108,10 +106,7 @@ int	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 		p->i += 1;
 	}
 	else if (cmd[p->i] == '>' || cmd[p->i] == '<')
-	{
-		if (!real_sign(p, p_cmd_start, cmd))
-			return (0);
-	}
+		return (real_sign(p, p_cmd_start, cmd));
 	else if (cmd[p->i] == '|')
 	{
 		n_elem = new_elem();
@@ -191,15 +186,11 @@ int	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 	char	*word;
 
 	if (is_r_resvd_char(&cmd[p->i], p->i, 0))
-	{
-		if (!reserved_chars(p, p_begin, cmd))
-			return (0);
-	}
+		return (reserved_chars(p, p_begin, cmd));
 	else if (is_r_space(&cmd[p->i], p->i))
 	{
 		p->i += 1;
-		if (!(out_quotes(p, p_begin, cmd)))
-			return (0);
+		return (out_quotes(p, p_begin, cmd));
 	}
 	else if (cmd[p->i] == '\'')
 		p->in_s_quotes = 1;

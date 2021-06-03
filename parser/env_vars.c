@@ -31,9 +31,14 @@ char 	*unvalid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
 	int		j;
 	char	*tmp_word;
 
-	if (is_space(cmd[p->i]) || cmd[p->i] == 0)
+	if (is_space(cmd[p->i]) || cmd[p->i] == 0 || cmd[p->i] == '"')
 		return (dup_dollar(p_begin));
-	tmp_word = get_redir_word(cmd, p, p_begin);
+	j = p->i;
+	while (!is_unesc_char(&cmd[p->i], p->i))
+		p->i += 1;
+	tmp_word = ft_strdup_len(cmd + j, p->i - j);
+	if (!tmp_word)
+		error_exit("malloc error", p_begin);
 	word = malloc(sizeof(char) * (ft_strlen(tmp_word) + 2));
 	if (!word)
 		error_exit("malloc error", p_begin);
