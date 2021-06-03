@@ -17,13 +17,6 @@ int	ft_putchar(int c)
 	return (1);
 }
 
-void	print_strtab(char **env)
-{
-	int i = 0;
-	while (env[i])
-		printf("%s\n", env[i++]);
-}
-
 int	option_n(char *arg)
 {
 	size_t	i;
@@ -67,7 +60,7 @@ int	builtin_echo(char **arg, int pid)
 	return (1);
 }
 
-void	cd_oldpwd()
+void	cd_oldpwd(void)
 {
 	if (!var_is_in_env(myenv, "OLDPWD"))
 		myenv = add_env_var_value(myenv, "OLDPWD", mygetenv(myenv, "PWD"));
@@ -75,7 +68,7 @@ void	cd_oldpwd()
 		modif_env_var_value(myenv, "OLDPWD", mygetenv(myenv, "PWD"));
 }
 
-void	cd_pwd()
+void	cd_pwd(void)
 {
 	char	*cwd;
 
@@ -272,8 +265,9 @@ int	overflow(char *str, size_t i)
 		return (1);
 	else if (len == 19)
 		if ((sign == 1 && ft_strncmp(str + i, "9223372036854775807", len) > 0)
-				|| (sign == -1 && ft_strncmp(str + i, "9223372036854775808", len) > 0))
-				return (1);
+			|| (sign == -1
+				&& ft_strncmp(str + i, "9223372036854775808", len) > 0))
+			return (1);
 	return (0);
 }
 
@@ -326,7 +320,7 @@ int	builtin_exit(char **arg, int pid, int pipes)
 	return (1);
 }
 
-int	do_builtin(char **cmd, int pid, int pipes) // faire un strcmp qui decaps
+int	do_builtin(char **cmd, int pid, int pipes)
 {
 	if (!ft_strcmp("echo", cmd[0]))
 		return (builtin_echo(cmd + 1, pid));
@@ -378,6 +372,7 @@ void	stat_check(char *cmd)
 {
 	struct stat	buf;
 
+	ft_memset(&buf, 0, sizeof(struct stat));
 	stat(cmd, &buf);
 	if (S_ISDIR(buf.st_mode) && ft_strchr(cmd, '/'))
 	{
@@ -442,13 +437,13 @@ void	launch_executable(char **cmd)
 	exit(127);
 }
 
-int		ctrl_execution(int new_value)
+int	ctrl_execution(int new_value)
 {
 	static int	b;
 	int			ret;
 
 	ret = b;
-	if (new_value >= 0)
+	if (new_value != 1)
 		b = new_value;
 	return (ret);
 }
@@ -500,18 +495,17 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 {
 	int	pipefd[2][2];
 	int	filefd[2];
+	int	firstcmd_pipes[2];
 	int	pid;
-	int	firstcmd;
-	int	pipes;
 	int	status;
 
 	*backslash = 0;
-	firstcmd = 1;
-	pipes = 0;
+	firstcmd_pipes[0] = 1;
+	firstcmd_pipes[1] = 0;
 	if (pipe_cmd->next)
-		pipes = 1;
+		firstcmd_pipes[1] = 1;
 	canonical_mode(1);
-	while (pipe_cmd && !ctrl_execution(-1) && (pipe_cmd->cmd || pipe_cmd->input))
+	while (pipe_cmd && !ctrl_execution(1) && (pipe_cmd->cmd || pipe_cmd->input))
 	{
 		pipefd[0][0] = pipefd[1][0];
 		pipefd[0][1] = pipefd[1][1];
@@ -521,7 +515,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 		pid = fork();
 		if (pid == 0)
 		{
-			if (!firstcmd && !pipe_cmd->input)
+			if (!firstcmd_pipes[0] && !pipe_cmd->input)
 				dup2(pipefd[0][0], STDIN_FILENO);
 			else if (pipe_cmd->input)
 			{
@@ -545,7 +539,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 			close(pipefd[1][0]);
 			close(pipefd[1][1]);
 		}
-		if (!firstcmd)
+		if (!firstcmd_pipes[0])
 		{
 			close(pipefd[0][0]);
 			close(pipefd[0][1]);
@@ -553,15 +547,15 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 		if (pipe_cmd->cmd)
 		{
 			if (is_builtin(pipe_cmd->cmd))
-				do_builtin(pipe_cmd->cmd, pid, pipes);
+				do_builtin(pipe_cmd->cmd, pid, firstcmd_pipes[1]);
 			else if (pid == 0)
 				launch_executable(pipe_cmd->cmd);
 		}
 		if (pid == 0)
-			exit(0); // pid == 0 exit(0); ici ou dans les builtin ?
+			exit(0);
 		waitpid(pid, &status, 0);
 		pipe_cmd = pipe_cmd->next;
-		firstcmd = 0;
+		firstcmd_pipes[0] = 0;
 	}
 	if (WIFEXITED(status))
 	{
@@ -569,7 +563,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 		free(myenv[0]);
 		myenv[0] = itoa_env_var("?=", status);
 	}
-	if (ctrl_execution(-1))
+	if (ctrl_execution(1))
 	{
 		free(myenv[0]);
 		myenv[0] = itoa_env_var("?=", ctrl_execution(0));
