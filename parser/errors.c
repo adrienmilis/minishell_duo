@@ -1,5 +1,17 @@
 #include "parser.h"
 
+void	error_free_pars(char *buffer, t_command *b_list, t_pipe_cmd *p_begin)
+{
+	if (buffer)
+		free(buffer);
+	free_list(b_list);
+	if (myenv)
+		free_strtab(myenv);
+	free_pipe_cmd(p_begin);
+	ft_putstr("minishell: fatal error\n");
+	exit(0);
+}
+
 void	set_exit_status(char *error, int status)
 {
 	ft_putstr("minishell: ");

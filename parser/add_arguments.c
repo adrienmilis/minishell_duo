@@ -11,7 +11,7 @@ void	add_argument2(char **new_args, int i, char *word, t_pipe_cmd *last)
 	free(tmp);
 }
 
-void	add_argument(char *word, t_pipe_cmd *p_begin)
+void	add_argument(char *word, t_pipe_cmd *p_begin, char *cmd, t_command *b_list)
 {
 	int			i;
 	char		**new_args;
@@ -26,7 +26,7 @@ void	add_argument(char *word, t_pipe_cmd *p_begin)
 			i++;
 	new_args = malloc(sizeof(char *) * (i + 2));
 	if (!new_args)
-		error_exit("malloc error", p_begin);
+		error_free_pars(cmd, b_list, p_begin);
 	i = 0;
 	if (last->cmd)
 	{
@@ -68,7 +68,7 @@ int	append_arg(t_pipe_cmd *last, char *word, char *tmp)
 	return (1);
 }
 
-char	*copy_next_word(char *cmd, t_pars *p, int wd_size, t_pipe_cmd *p_start)
+char	*copy_next_word(char *cmd, t_pars *p, int wd_size, t_pipe_cmd *p_begin, t_command *b_list)
 {
 	char	*word;
 	int		j;
@@ -77,7 +77,7 @@ char	*copy_next_word(char *cmd, t_pars *p, int wd_size, t_pipe_cmd *p_start)
 		return (NULL);
 	word = malloc(sizeof(char) * wd_size);
 	if (!word)
-		error_exit("malloc error", p_start);
+		error_free_pars(cmd, b_list, p_begin);
 	j = 0;
 	while (!is_r_space(&cmd[p->i], p->i)
 		&& !is_r_resvd_char(&cmd[p->i], p->i, 1)
@@ -91,7 +91,7 @@ char	*copy_next_word(char *cmd, t_pars *p, int wd_size, t_pipe_cmd *p_start)
 	return (word);
 }
 
-char	*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start)
+char	*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start, t_command *b_list)
 {
 	char	*word;
 	int		j;
@@ -102,7 +102,7 @@ char	*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start)
 		p->i += 1;
 	if (cmd[p->i] == '$')
 	{
-		word = get_variable(p, cmd, p_cmd_start);
+		word = get_variable(p, cmd, p_cmd_start, b_list);
 		p->word_from_variable = 1;
 		return (word);
 	}
@@ -115,6 +115,6 @@ char	*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start)
 			escaped++;
 		j++;
 	}
-	word = copy_next_word(cmd, p, j - escaped - p->i + 1, p_cmd_start);
+	word = copy_next_word(cmd, p, j - escaped - p->i + 1, p_cmd_start, b_list);
 	return (word);
 }

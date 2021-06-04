@@ -1,44 +1,45 @@
 #include "parser.h"
 
-char 	*get_redir_word(char *cmd, t_pars *p, t_pipe_cmd *p_begin)
+char 	*get_redir_word(char *cmd, t_pars *p, t_pipe_cmd *p_begin, t_command *b_list)
 {
 	char	*new_word;
 	char	*word;
 
 	while (is_space(cmd[p->i]))
 		p->i += 1;
+	p->r = 1;
 	if (cmd[p->i] == '\'')
-		word = arg_simple_quotes(p, p_begin, cmd, 1);
+		word = arg_simple_quotes(p, p_begin, cmd, b_list);
 	else if (cmd[p->i] == '"')
-		word = arg_double_quotes(p, p_begin, cmd, 1);
+		word = arg_double_quotes(p, p_begin, cmd, b_list);
 	else
-		word = get_next_word(cmd, p, p_begin);
+		word = get_next_word(cmd, p, p_begin, b_list);
 	while (!is_r_space(&cmd[p->i], p->i) && !is_r_resvd_char(&cmd[p->i], p->i, 0) && cmd[p->i])
 	{
 		if (cmd[p->i] == '\'')
-			word = ft_strjoin_w_ns(word, arg_simple_quotes(p, p_begin, cmd, 1));
+			word = ft_strjoin_w_ns(word, arg_simple_quotes(p, p_begin, cmd, b_list));
 		else if (cmd[p->i] == '"')
-			word = ft_strjoin_w_ns(word, arg_double_quotes(p, p_begin, cmd, 1));
+			word = ft_strjoin_w_ns(word, arg_double_quotes(p, p_begin, cmd, b_list));
 		else
 		{
-			new_word = get_next_word(cmd, p, p_begin);
+			new_word = get_next_word(cmd, p, p_begin, b_list);
 			// printf("new word [%s]\n", new_word);
 			word = ft_strjoin_w_ns(word, new_word);
 			// printf("cat word [%s]\n", word);
 		}
 	}
+	p->r = 0;
 	return (word);
 }
 
-int	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign)
+int	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign, t_command *b_list)
 {
 	char		*word;
 	t_pipe_cmd	*last;
 	int			fd;
 
 	last = ft_lstlast(p_begin);
-	// word = get_next_word(cmd, p, p_cmd_start); // changer ici si on a simple ou double, faire une fct en plus qui get le word
-	word = get_redir_word(cmd, p, p_begin);
+	word = get_redir_word(cmd, p, p_begin, b_list);
 	if ((!word && p->var_not_exist) || (word && space_middle_of_word(word) && p->word_from_variable))
 	{
 		free(word);
@@ -75,7 +76,7 @@ int	real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign)
 	return (1);
 }
 
-int	real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
+int	real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, t_command *b_list)
 {
 	t_pipe_cmd	*last;
 	char		sign;
@@ -93,10 +94,10 @@ int	real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 			last->double_greater = 0;
 	}
 	p->i += 1;
-	return (real_sign2(p, p_cmd_start, cmd, sign));
+	return (real_sign2(p, p_cmd_start, cmd, sign, b_list));
 }
 
-int	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
+int	reserved_chars(t_pars *p, t_pipe_cmd *p_begin, char *cmd, t_command *b_list)
 {
 	t_pipe_cmd	*n_elem;
 
@@ -106,13 +107,13 @@ int	reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd)
 		p->i += 1;
 	}
 	else if (cmd[p->i] == '>' || cmd[p->i] == '<')
-		return (real_sign(p, p_cmd_start, cmd));
+		return (real_sign(p, p_begin, cmd, b_list));
 	else if (cmd[p->i] == '|')
 	{
 		n_elem = new_elem();
 		if (!n_elem)
-			error_exit("malloc error", p_cmd_start);
-		ft_lstadd_back(&p_cmd_start, n_elem);
+			error_free_pars(cmd, b_list, p_begin);
+		ft_lstadd_back(&p_begin, n_elem);
 		p->i += 1;
 	}
 	return (1);
@@ -135,7 +136,7 @@ int	must_append(int i, char *cmd, t_pars *p)
 	return (0);
 }
 
-char	*make_word(char	*word, t_pipe_cmd *p_begin, t_pars *p)
+char	*make_word(char	*word, t_pipe_cmd *p_begin, t_pars *p, char *cmd, t_command *b_list)
 {
 	char		*new_word;
 	int			j;
@@ -155,42 +156,42 @@ char	*make_word(char	*word, t_pipe_cmd *p_begin, t_pars *p)
 	}
 	new_word = ft_strdup_len(word + j, i - j);
 	if (!new_word)
-		error_exit("malloc error", p_begin);
+		error_free_pars(cmd, b_list, p_begin);
 	return (new_word);
 }
 
-void	argument_w_spaces(char *word, int append, t_pipe_cmd *p_begin, t_pars *p)
+void	argument_w_spaces(char *word, int append, t_pipe_cmd *p_begin, t_pars *p, t_command *b_list, char *cmd)
 {
 	char	*new_word;
 	int		i;
 
 	i = 0;
-	new_word = make_word(word, p_begin, p);
+	new_word = make_word(word, p_begin, p, cmd, b_list);
 	while (new_word)
 	{
 		if (append && !is_space(word[0]))
 		{
 			if (!(append_arg(ft_lstlast(p_begin), new_word, NULL)))
-				error_exit("malloc error", p_begin);
+				error_free_pars(cmd, b_list, p_begin);
 			append = 0;
 		}
 		else
-			add_argument(new_word, p_begin);
-		new_word = make_word(word, p_begin, p);
+			add_argument(new_word, p_begin, cmd, b_list);
+		new_word = make_word(word, p_begin, p, cmd, b_list);
 	}
 	free(word);
 }
 
-int	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
+int	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, t_command *b_list)
 {
 	char	*word;
 
 	if (is_r_resvd_char(&cmd[p->i], p->i, 0))
-		return (reserved_chars(p, p_begin, cmd));
+		return (reserved_chars(p, p_begin, cmd, b_list));
 	else if (is_r_space(&cmd[p->i], p->i))
 	{
 		p->i += 1;
-		return (out_quotes(p, p_begin, cmd));
+		return (out_quotes(p, p_begin, cmd, b_list));
 	}
 	else if (cmd[p->i] == '\'')
 		p->in_s_quotes = 1;
@@ -198,26 +199,26 @@ int	out_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd)
 		p->in_d_quotes = 1;
 	else if (must_append(p->i, cmd, p)/*p->i != 0 && !is_r_space(&cmd[p->i - 1], p->i - 1) && !is_r_resvd_char(&cmd[p->i - 1], p->i - 1, 0)*/)
 	{
-		word = get_next_word(cmd, p, p_begin);
+		word = get_next_word(cmd, p, p_begin, b_list);
 		if (word)
 		{
 			if (p->word_from_variable && space_in_word(word))
-				argument_w_spaces(word, 1, p_begin, p);
+				argument_w_spaces(word, 1, p_begin, p, b_list, cmd);
 			else
 				if (!append_arg(ft_lstlast(p_begin), word, NULL))
-					error_exit("malloc error", p_begin);
+					error_free_pars(cmd, b_list, p_begin);
 		}
 		p->word_from_variable = 0;
 	}
 	else	// on est au debut d'un mot et pas de quote avant
 	{
-		word = get_next_word(cmd, p, p_begin);
+		word = get_next_word(cmd, p, p_begin, b_list);
 		if (word)
 		{
 			if (p->word_from_variable && space_in_word(word))
-				argument_w_spaces(word, 0, p_begin, p);
+				argument_w_spaces(word, 0, p_begin, p, b_list, cmd);
 			else
-				add_argument(word, p_begin);
+				add_argument(word, p_begin, cmd, b_list);
 		}
 		p->word_from_variable = 0; // ici ?
 	}

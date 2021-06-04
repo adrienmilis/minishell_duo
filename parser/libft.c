@@ -13,7 +13,11 @@ char	*ft_strjoin_w_ns(char *s1, char *s2)
 	str_cat = malloc((ft_strlen((char *)s1)
 				+ ft_strlen((char *)s2) + 1) * sizeof(char));
 	if (!str_cat)
+	{
+		free(s1);
+		free(s2);
 		return (NULL);
+	}
 	i = 0;
 	j = 0;
 	while (s1[j])

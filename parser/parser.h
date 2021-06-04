@@ -26,6 +26,7 @@ typedef struct s_pars
 	int	prev_var_w_space;
 	int	word_from_variable;
 	int	var_not_exist;
+	int	r;
 }				t_pars;
 
 typedef struct s_command
@@ -36,7 +37,9 @@ typedef struct s_command
 }				t_command;
 
 void	ft_putstr(char *str);
-void	error_free(char *buffer, t_command *begin_list);
+void	error_free_pars(char *buffer, t_command *b_list, t_pipe_cmd *p_begin);
+void	free_list(t_command	*begin_list);
+char	**free_strtab(char **strtab);
 
 // errors.c
 void	set_exit_status(char *error, int status);
@@ -45,28 +48,29 @@ void	free_pipe_cmd(t_pipe_cmd *begin_list);
 void	error_exit(char *msg, t_pipe_cmd *begin_list);
 
 // parse_out_quotes.c
-char 	*get_redir_word(char *cmd, t_pars *p, t_pipe_cmd *p_begin);
-int		real_sign2(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, char sign);
-int		real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
-int		reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
+void	argument_w_spaces(char *word, int append, t_pipe_cmd *p_begin, t_pars *p, t_command *b_list, char *cmd);
+char 	*get_redir_word(char *cmd, t_pars *p, t_pipe_cmd *p_begin, t_command *b_list);
+int		real_sign2(t_pars *p, t_pipe_cmd *p_begin, char *cmd, char sign, t_command *b_list);
+int		real_sign(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, t_command *b_list);
+int		reserved_chars(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, t_command *b_list);
 int		must_append(int i, char *cmd, t_pars *p);
-int		out_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
+int		out_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, t_command *b_list);
 
 // double_quotes.c
-void	doubleq_special(t_pars *p, char *cmd, t_pipe_cmd *p_begin, char **buff);
-char	*make_dquotes_arg(t_pars *p, char *cmd, t_pipe_cmd *p_begin);
-char	*arg_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, int r);
-void	in_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd);
+void	doubleq_special(t_pars *p, char *cmd, t_pipe_cmd *p_begin, char **buff, t_command *b_list);
+char	*make_dquotes_arg(t_pars *p, char *cmd, t_pipe_cmd *p_begin, t_command *b_list);
+char	*arg_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, t_command *b_list);
+void	in_double_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, t_command *b_list);
 
 // parser.c
-t_pipe_cmd	*parser(char *cmd, int new_command, char *buffer, t_command *b_list);
+t_pipe_cmd	*parser(char *cmd, int new_command, t_command *b_list);
 
 // add_arguments.c
 void		add_argument2(char **new_args, int i, char *word, t_pipe_cmd *last);
 int			append_arg(t_pipe_cmd *last, char *word, char *tmp);
-void		add_argument(char *word, t_pipe_cmd *p_begin);
-char		*copy_next_word(char *cmd, t_pars *p, int word_size, t_pipe_cmd *p_cmd_start);
-char		*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start);
+void		add_argument(char *word, t_pipe_cmd *p_begin, char *cmd, t_command *b_list);
+char		*copy_next_word(char *cmd, t_pars *p, int word_size, t_pipe_cmd *p_cmd_start, t_command *b_list);
+char		*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start, t_command *b_list);
 
 // utils.c
 void 		set_quotes(int i, char *cmd, t_pars *p);
@@ -119,14 +123,14 @@ char	*get_env_var(int index);
 
 // env_vars.c
 char	*gnw_double_quotes(t_pars *p, char *cmd, t_pipe_cmd *p_begin);
-char	*dup_dollar(t_pipe_cmd *p_begin);
-char 	*unvalid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_begin);
-char	*valid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_cmd_start);
-char	*get_variable(t_pars *p, char *cmd, t_pipe_cmd *p_begin);
+char	*dup_dollar(t_pipe_cmd *p_begin, char *cmd, t_command *b_list);
+char 	*unvalid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_begin, t_command *b_list);
+char	*valid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_cmd_start, t_command *b_list);
+char	*get_variable(t_pars *p, char *cmd, t_pipe_cmd *p_begin, t_command *b_list);
 
 // simple_quotes.c
-char	*arg_simple_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, int r);
-void	in_simple_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd);
+char	*arg_simple_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, t_command *b_list);
+void	in_simple_quotes(t_pars *p, t_pipe_cmd *p_cmd_start, char *cmd, t_command *b_list);
 
 // dupl_fcts.c
 char			*ft_strdup(char *str);

@@ -1,30 +1,30 @@
 #include "parser.h"
 
-char	*gnw_double_quotes(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
-{
-	char	*word;
-	int		start;
+// char	*gnw_double_quotes(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
+// {
+// 	char	*word;
+// 	int		start;
 
-	start = p->i;
-	while (!is_space(cmd[p->i]) && cmd[p->i] != '"')
-		p->i++;
-	word = ft_strdup_len(cmd + start, p->i - start);
-	if (!word)
-		error_exit("malloc error", p_begin);
-	return (word);
-}
+// 	start = p->i;
+// 	while (!is_space(cmd[p->i]) && cmd[p->i] != '"')
+// 		p->i++;
+// 	word = ft_strdup_len(cmd + start, p->i - start);
+// 	if (!word)
+// 		error_exit("malloc error", p_begin);
+// 	return (word);
+// }
 
-char	*dup_dollar(t_pipe_cmd *p_begin)
+char	*dup_dollar(t_pipe_cmd *p_begin, char *cmd, t_command *b_list)
 {
 	char	*word;
 
 	word = ft_strdup("$");
 	if (!word)
-		error_exit("malloc error", p_begin);
+		error_free_pars(cmd, b_list, p_begin);
 	return (word);
 }
 
-char 	*unvalid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
+char 	*unvalid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_begin, t_command *b_list)
 {
 	char	*word;
 	int		i;
@@ -32,16 +32,16 @@ char 	*unvalid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
 	char	*tmp_word;
 
 	if (is_space(cmd[p->i]) || cmd[p->i] == 0 || cmd[p->i] == '"')
-		return (dup_dollar(p_begin));
+		return (dup_dollar(p_begin, cmd, b_list));
 	j = p->i;
 	while (!is_unesc_char(&cmd[p->i], p->i))
 		p->i += 1;
 	tmp_word = ft_strdup_len(cmd + j, p->i - j);
 	if (!tmp_word)
-		error_exit("malloc error", p_begin);
+		error_free_pars(cmd, b_list, p_begin);
 	word = malloc(sizeof(char) * (ft_strlen(tmp_word) + 2));
 	if (!word)
-		error_exit("malloc error", p_begin);
+		error_free_pars(cmd, b_list, p_begin);
 	i = 1;
 	j = 0;
 	word[0] = '$';
@@ -52,7 +52,7 @@ char 	*unvalid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
 	return (word);
 }
 
-char	*valid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_cmd_start)
+char	*valid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_begin, t_command *b_list)
 {
 	char	*var_name;
 	int		start;
@@ -65,7 +65,7 @@ char	*valid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_cmd_start)
 		p->i += 1;
 	var_name = ft_strdup_len(cmd + start, p->i - start);
 	if (!var_name)
-		error_exit("malloc error", p_cmd_start);
+		error_free_pars(cmd, b_list, p_begin);
 	while (myenv[j] && strcmp_env(var_name, myenv[j]))
 		j++;
 	free(var_name);
@@ -73,13 +73,13 @@ char	*valid_var_name(t_pars *p, char *cmd, t_pipe_cmd *p_cmd_start)
 		return (NULL);
 	var_value = get_env_var(j);
 	if (!var_value)
-		error_exit("malloc error", p_cmd_start);
+		error_free_pars(cmd, b_list, p_begin);
 	return (var_value);
 }
 
-char	*get_variable(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
+char	*get_variable(t_pars *p, char *cmd, t_pipe_cmd *p_begin, t_command *b_list)
 {
-	char	*word;
+	char		*word;
 	static int	r_space;
 
 	if (is_r_space(&cmd[p->i - 1], p->i - 1))
@@ -91,9 +91,9 @@ char	*get_variable(t_pars *p, char *cmd, t_pipe_cmd *p_begin)
 		return (NULL);
 	}
 	if (!valid_var_char(cmd[p->i]))
-		word = unvalid_var_name(p, cmd, p_begin);
+		word = unvalid_var_name(p, cmd, p_begin, b_list);
 	else
-		word = valid_var_name(p, cmd, p_begin);
+		word = valid_var_name(p, cmd, p_begin, b_list);
 	if (word == NULL && r_space)
 		p->var_not_exist = 1;
 	if (word)
