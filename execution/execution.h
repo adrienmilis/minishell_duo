@@ -44,6 +44,29 @@ typedef struct	s_exec_data
 
 int	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash);
 
+int	free_exit_exec(int status, t_pipe_cmd *pipe_cmd, t_PATH *PATH);
+void	error_input(char *input, t_pipe_cmd *begin, int pipefd[2][2], \
+		t_exec_data d);
+int	error_exec(t_pipe_cmd *beg, int pipefd[2][2], t_exec_data d);
+
+int	exit_status(int new_status, int pid, int check_main);
+int	ctrl_execution(int new_value);
+void	handler_signal_execution(int sig);
+void	canonical_mode(int set);
+
+int	launch_executable(char **cmd, t_pipe_cmd *begin);
+
+int	do_builtin(char **cmd, int pid, int pipes);
+int	is_builtin(char **cmd);
+
+int	builtin_echo(char **arg, int pid);
+int	builtin_cd(char **arg, int pid, int pipes);
+int	builtin_export(char **arg, int pid, int pipes);
+int	builtin_pwd(int pid);
+int	builtin_unset(char **arg, int pid, int pipes);
+int	builtin_env(int pid);
+int	builtin_exit(char **arg, int pid, int pipes);
+
 size_t	strlen_env_var(char *var);
 int		strcmp_env(const char *s1, const char *s2);
 size_t	strtablen(char **strtab);

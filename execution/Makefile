@@ -1,6 +1,14 @@
 NAME		=	execution.a
 
 SRCS		=	execution.c \
+				exec_error_exit.c \
+				exec_utils.c \
+				launch_executable.c \
+				builtin.c \
+				builtin_echo_cd.c \
+				builtin_export.c \
+				builtin_pwd_unset_env.c \
+				builtin_exit.c \
 				myenv.c \
 				ft_split.c \
 				utils.c
