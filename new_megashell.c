@@ -111,6 +111,10 @@ int	enter_event(char **buffer, t_command **begin_list)
 	pipe_cmd = parser(*buffer, 1, *begin_list);
 	if (pipe_cmd == NULL)
 	{
+		new_elem = new_elem_history(*buffer);
+		if (!new_elem)
+			error_free(*buffer, *begin_list);	// buffer if exists, t_command
+		ft_lstadd_front(begin_list, new_elem);
 		write(1, "megashell> ", 11);
 		free(*buffer);
 		*buffer = NULL;
