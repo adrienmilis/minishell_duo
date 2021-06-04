@@ -63,10 +63,3 @@ void	free_pipe_cmd(t_pipe_cmd *begin_list)
 		free(prev);
 	}
 }
-
-void	error_exit(char *msg, t_pipe_cmd *begin_list)
-{
-	free_pipe_cmd(begin_list);
-	printf("minishell: %s\n", msg);
-	exit(0);
-}

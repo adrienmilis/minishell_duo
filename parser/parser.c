@@ -1,8 +1,20 @@
 #include "parser.h"
 
+void	init_package(t_package *s, t_command *b_list, char *cmd)
+{
+	t_pipe_cmd	*p_begin;
+
+	p_begin = init_pipe_list();
+	if (!p_begin)
+		error_free_pars(cmd, b_list, NULL);
+	s->b_list = b_list;
+	s->cmd = cmd;
+	s->p_begin = p_begin;
+}
+
 t_pipe_cmd	*parser(char *cmd, int new_command, t_command *b_list)
 {
-	t_pipe_cmd		*p_cmd_start;
+	t_package		s;
 	static t_pars	p;
 
 	if (!cmd || !cmd[0] || !check_syntax(cmd))
@@ -10,25 +22,21 @@ t_pipe_cmd	*parser(char *cmd, int new_command, t_command *b_list)
 	init_pars_struct(&p, new_command, cmd[0]);
 	if (!cmd[p.i])
 		return (NULL);
-	p_cmd_start = init_pipe_list();
-	if (!p_cmd_start)
-		error_free_pars(cmd, b_list, NULL);	// est-ce qu'on garde comme ca ?
+	init_package(&s, b_list, cmd);
 	while (!p.semicolon && cmd[p.i])
 	{
 		if (!p.in_d_quotes && !p.in_s_quotes)
 		{
-			if (!out_quotes(&p, p_cmd_start, cmd, b_list))
+			if (!out_quotes(&p, &s))
 			{
-				free_pipe_cmd(p_cmd_start);
+				free_pipe_cmd(s.p_begin);
 				return (NULL);
 			}
 		}
 		else if (p.in_s_quotes)
-			in_simple_quotes(&p, p_cmd_start, cmd, b_list);
+			in_simple_quotes(&p, &s);
 		else
-			in_double_quotes(&p, p_cmd_start, cmd, b_list);
+			in_double_quotes(&p, &s);
 	}
-	reset_pars_struct(&p);
-	// print_list(p_cmd_start);
-	return (p_cmd_start);
+	return (reset_pars_struct(&p, s));
 }

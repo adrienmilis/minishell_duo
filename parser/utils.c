@@ -1,7 +1,5 @@
 #include "parser.h"
 
-// parsing struct
-
 t_pipe_cmd	*init_pipe_list(void)
 {
 	t_pipe_cmd	*p_cmd_start;
@@ -43,7 +41,7 @@ void	init_pars_struct(t_pars *p, int new_command, char c)
 	}
 }
 
-void	reset_pars_struct(t_pars *p)
+t_pipe_cmd	*reset_pars_struct(t_pars *p, t_package s)
 {
 	p->in_d_quotes = 0;
 	p->in_s_quotes = 0;
@@ -52,6 +50,7 @@ void	reset_pars_struct(t_pars *p)
 	p->word_from_variable = 0;
 	p->var_not_exist = 0;
 	p->r = 0;
+	return (s.p_begin);
 }
 
 void	set_quotes(int i, char *cmd, t_pars *p)

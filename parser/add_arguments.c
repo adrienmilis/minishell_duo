@@ -1,17 +1,27 @@
 #include "parser.h"
 
-void	add_argument2(char **new_args, int i, char *word, t_pipe_cmd *last)
+void	add_argument2(char **new_args, char *word, t_pipe_cmd *last)
 {
 	char	**tmp;
+	int		j;
 
-	new_args[i] = word;
-	new_args[i + 1] = 0;
+	j = 0;
+	if (last->cmd)
+	{
+		while (last->cmd[j])
+		{
+			new_args[j] = last->cmd[j];
+			j++;
+		}
+	}
+	new_args[j] = word;
+	new_args[j + 1] = 0;
 	tmp = last->cmd;
 	last->cmd = new_args;
 	free(tmp);
 }
 
-void	add_argument(char *word, t_pipe_cmd *p_begin, char *cmd, t_command *b_list)
+void	add_argument(char *word, t_package *s, char *word_to_free)
 {
 	int			i;
 	char		**new_args;
@@ -19,24 +29,19 @@ void	add_argument(char *word, t_pipe_cmd *p_begin, char *cmd, t_command *b_list)
 
 	if (!word)
 		return ;
-	last = ft_lstlast(p_begin);
+	last = ft_lstlast(s->p_begin);
 	i = 0;
 	if (last->cmd)
 		while (last->cmd[i])
 			i++;
 	new_args = malloc(sizeof(char *) * (i + 2));
 	if (!new_args)
-		error_free_pars(cmd, b_list, p_begin);
-	i = 0;
-	if (last->cmd)
 	{
-		while (last->cmd[i])
-		{
-			new_args[i] = last->cmd[i];
-			i++;
-		}
+		free(word);
+		free(word_to_free);
+		error_free_pars(s->cmd, s->b_list, s->p_begin);
 	}
-	add_argument2(new_args, i, word, last);
+	add_argument2(new_args, word, last);
 }
 
 int	append_arg(t_pipe_cmd *last, char *word, char *tmp)
@@ -68,7 +73,7 @@ int	append_arg(t_pipe_cmd *last, char *word, char *tmp)
 	return (1);
 }
 
-char	*copy_next_word(char *cmd, t_pars *p, int wd_size, t_pipe_cmd *p_begin, t_command *b_list)
+char	*copy_next_word(t_pars *p, int wd_size, t_package *s)
 {
 	char	*word;
 	int		j;
@@ -77,44 +82,45 @@ char	*copy_next_word(char *cmd, t_pars *p, int wd_size, t_pipe_cmd *p_begin, t_c
 		return (NULL);
 	word = malloc(sizeof(char) * wd_size);
 	if (!word)
-		error_free_pars(cmd, b_list, p_begin);
+		error_free_pars(s->cmd, s->b_list, s->p_begin);
 	j = 0;
-	while (!is_r_space(&cmd[p->i], p->i)
-		&& !is_r_resvd_char(&cmd[p->i], p->i, 1)
-		&& !is_r_quote(&cmd[p->i], p->i) && cmd[p->i])
+	while (!is_r_space(&s->cmd[p->i], p->i)
+		&& !is_r_resvd_char(&s->cmd[p->i], p->i, 1)
+		&& !is_r_quote(&s->cmd[p->i], p->i) && s->cmd[p->i])
 	{
-		if (!(cmd[p->i] == '\\' && !is_unesc_char(&cmd[p->i + 1], p->i + 1)))
-			word[j++] = cmd[p->i];
+		if (!(s->cmd[p->i] == '\\'
+				&& !is_unesc_char(&s->cmd[p->i + 1], p->i + 1)))
+			word[j++] = s->cmd[p->i];
 		(p->i)++;
 	}
 	word[j] = 0;
 	return (word);
 }
 
-char	*get_next_word(char *cmd, t_pars *p, t_pipe_cmd *p_cmd_start, t_command *b_list)
+char	*get_next_word(t_pars *p, t_package *s)
 {
 	char	*word;
 	int		j;
 	int		escaped;
 
 	escaped = 0;
-	while (is_r_space(&cmd[p->i], p->i))
+	while (is_r_space(&s->cmd[p->i], p->i))
 		p->i += 1;
-	if (cmd[p->i] == '$')
+	if (s->cmd[p->i] == '$')
 	{
-		word = get_variable(p, cmd, p_cmd_start, b_list);
+		word = get_variable(p, s);
 		p->word_from_variable = 1;
 		return (word);
 	}
 	j = p->i;
-	while (!is_r_space(&cmd[j], j)
-		&& !is_r_resvd_char(&cmd[j], j, 1)
-		&& !is_r_quote(&cmd[j], j) && cmd[j])
+	while (!is_r_space(&s->cmd[j], j)
+		&& !is_r_resvd_char(&s->cmd[j], j, 1)
+		&& !is_r_quote(&s->cmd[j], j) && s->cmd[j])
 	{
-		if (!is_unesc_char(&cmd[j], j))
+		if (!is_unesc_char(&s->cmd[j], j))
 			escaped++;
 		j++;
 	}
-	word = copy_next_word(cmd, p, j - escaped - p->i + 1, p_cmd_start, b_list);
+	word = copy_next_word(p, j - escaped - p->i + 1, s);
 	return (word);
 }

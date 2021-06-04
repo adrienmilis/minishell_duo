@@ -12,7 +12,9 @@ SRCS = parser.c \
 	simple_quotes.c \
 	check_chars2.c \
 	check_chars3.c \
-	double_quotes.c
+	double_quotes.c \
+	out_quotes_utils.c \
+	signs.c
 
 SRCS_PARS = parser.c \
 	utils.c \
@@ -30,7 +32,9 @@ SRCS_PARS = parser.c \
 	check_chars2.c \
 	check_chars3.c \
 	dupl_fcts.c \
-	double_quotes.c 
+	double_quotes.c \
+	out_quotes_utils.c \
+	signs.c
 
 OBJS = $(SRCS:.c=.o)
 NAME = parser.a

@@ -1,6 +1,15 @@
 #include "parser.h"
 
-char	*arg_simple_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, t_command *b_list)
+void	append_simple(char *new_arg, t_package *s)
+{
+	if (!(append_arg(ft_lstlast(s->p_begin), new_arg, NULL)))
+	{
+		free(new_arg);
+		error_free_pars(s->cmd, s->b_list, s->p_begin);
+	}
+}
+
+char	*arg_simple_quotes(t_pars *p, t_package *s)
 {
 	int		beg;
 	int		start;
@@ -9,40 +18,34 @@ char	*arg_simple_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, t_command *b_
 	beg = p->i;
 	p->i += 1;
 	start = p->i;
-	while (cmd[p->i] != '\'')
+	while (s->cmd[p->i] != '\'')
 		p->i += 1;
-	new_arg = ft_strdup_len(cmd + start, p->i - start);
+	new_arg = ft_strdup_len(s->cmd + start, p->i - start);
 	if (!new_arg)
-		error_free_pars(cmd, b_list, p_begin);
+		error_free_pars(s->cmd, s->b_list, s->p_begin);
 	if (p->r)
 	{
 		p->i += 1;
 		return (new_arg);
 	}
-	if (must_append(beg, cmd, p)/*beg != 0 && !is_r_space(&cmd[beg - 1], beg - 1)*/)
-	{
-		if (!(append_arg(ft_lstlast(p_begin), new_arg, NULL)))
-		{
-			free(new_arg);
-			error_free_pars(cmd, b_list, p_begin);
-		}
-	}
+	if (must_append(beg, s->cmd, p))
+		append_simple(new_arg, s);
 	else
-		add_argument(new_arg, p_begin, cmd, b_list);
+		add_argument(new_arg, s, NULL);
 	p->i += 1;
 	p->in_s_quotes = 0;
 	return (NULL);
 }
 
-void	in_simple_quotes(t_pars *p, t_pipe_cmd *p_begin, char *cmd, t_command *b_list)
+void	in_simple_quotes(t_pars *p, t_package *s)
 {
-	if (cmd[p->i + 1] == '\'')
+	if (s->cmd[p->i + 1] == '\'')
 	{
-		if (!must_append(p->i, cmd, p))
-			add_argument(ft_strdup(""), p_begin, cmd, b_list);
+		if (!must_append(p->i, s->cmd, p))
+			add_argument(ft_strdup(""), s, NULL);
 		p->i += 2;
 		p->in_s_quotes = 0;
 	}
 	else
-		arg_simple_quotes(p, p_begin, cmd, b_list);
+		arg_simple_quotes(p, s);
 }

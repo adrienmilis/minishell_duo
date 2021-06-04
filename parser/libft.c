@@ -1,5 +1,11 @@
 #include "parser.h"
 
+void	free_in_join(char *s1, char *s2)
+{
+	free(s1);
+	free(s2);
+}
+
 char	*ft_strjoin_w_ns(char *s1, char *s2)
 {
 	char	*str_cat;
@@ -14,8 +20,7 @@ char	*ft_strjoin_w_ns(char *s1, char *s2)
 				+ ft_strlen((char *)s2) + 1) * sizeof(char));
 	if (!str_cat)
 	{
-		free(s1);
-		free(s2);
+		free_in_join(s1, s2);
 		return (NULL);
 	}
 	i = 0;
@@ -26,8 +31,7 @@ char	*ft_strjoin_w_ns(char *s1, char *s2)
 	while (s2[j])
 		str_cat[i++] = s2[j++];
 	str_cat[i] = '\0';
-	free(s1);
-	free(s2);
+	free_in_join(s1, s2);
 	return (str_cat);
 }
 
