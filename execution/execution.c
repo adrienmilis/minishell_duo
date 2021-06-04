@@ -11,12 +11,10 @@
 #include <string.h>
 #include <fcntl.h>*/
 
-int	free_exit_exec(int status, t_pipe_cmd *pipe_cmd, t_command *begin_list, t_PATH *PATH)
+int	free_exit_exec(int status, t_pipe_cmd *pipe_cmd, t_PATH *PATH)
 {
 	free_strtab(myenv);
 	free_pipe_cmd(pipe_cmd);
-	if (begin_list)
-		free_list(begin_list);
 	if (PATH && PATH->split)
 		free_strtab(PATH->split);
 	exit(status);
@@ -382,15 +380,15 @@ int	is_builtin(char **cmd)
 		return (0);
 }
 
-void	no_permission(char *cmd, t_pipe_cmd *begin, t_command *begin_list, t_PATH *PATH)
+void	no_permission(char *cmd, t_pipe_cmd *begin, t_PATH *PATH)
 {
 	write(2, "minishell: ", 11);
 	write(2, cmd, ft_strlen(cmd));
 	write(2, ": Permission denied\n", 20);
-	free_exit_exec(126, begin, begin_list, PATH);
+	free_exit_exec(126, begin, PATH);
 }
 
-void	stat_check(char *cmd, t_pipe_cmd *begin, t_command *begin_list, t_PATH *PATH)
+void	stat_check(char *cmd, t_pipe_cmd *begin, t_PATH *PATH)
 {
 	struct stat	buf;
 
@@ -401,18 +399,18 @@ void	stat_check(char *cmd, t_pipe_cmd *begin, t_command *begin_list, t_PATH *PAT
 		write(2, "minishell: ", 11);
 		write(2, cmd, ft_strlen(cmd));
 		write(2, ": is a directory\n", 17);
-		free_exit_exec(126, begin, begin_list, PATH);
+		free_exit_exec(126, begin, PATH);
 	}
 	else if (S_ISREG(buf.st_mode) && ft_strchr(cmd, '/'))
 	{
 		if (!(buf.st_mode & S_IRUSR) || !(buf.st_mode & S_IXUSR))
-			no_permission(cmd, begin, begin_list, PATH);
+			no_permission(cmd, begin, PATH);
 		else
-			free_exit_exec(0, begin, begin_list, PATH);
+			free_exit_exec(0, begin, PATH);
 	}
 }
 
-void	launch_executable(char **cmd, t_pipe_cmd *begin, t_command *begin_list)
+void	launch_executable(char **cmd, t_pipe_cmd *begin)
 {
 	int		i;
 	char	*cmd0;
@@ -434,7 +432,7 @@ void	launch_executable(char **cmd, t_pipe_cmd *begin, t_command *begin_list)
 	if (ft_strchr(cmd[0], '/') || !(PATH.value && PATH.value[0]))
 		execve(cmd[0], cmd, myenv + 1);
 	if (errno == EACCES && ft_strchr(cmd[0], '/'))
-		stat_check(cmd[0], begin, begin_list, &PATH);
+		stat_check(cmd[0], begin, &PATH);
 	cmd0 = cmd[0];
 	if (PATH.value && PATH.value[0] && PATH.split[0])
 		cmd[0] = ft_strjoin(PATH.split[0], cmd0, '/');
@@ -444,21 +442,21 @@ void	launch_executable(char **cmd, t_pipe_cmd *begin, t_command *begin_list)
 		while (execve(cmd[0], cmd, myenv + 1) == -1 && PATH.split[i])
 		{
 			if (errno == EACCES && ft_strchr(cmd0, '/'))
-				no_permission(cmd0, begin, begin_list, &PATH);
+				no_permission(cmd0, begin, &PATH);
 			free(cmd[0]);
 			cmd[0] = ft_strjoin(PATH.split[i++], cmd0, '/');
 		}
 		if (errno == EACCES && ft_strchr(cmd[0], '/'))
-			no_permission(cmd[0], begin, begin_list, &PATH);
+			no_permission(cmd[0], begin, &PATH);
 	}
-	stat_check(cmd0, begin, begin_list, &PATH);
+	stat_check(cmd0, begin, &PATH);
 	write(2, "minishell: ", 11);
 	write(2, cmd0, ft_strlen(cmd0));
 	if (!ft_strchr(cmd0, '/') && PATH.value && PATH.value[0])
 		write(2, ": command not found\n", 20);
 	else
 		write(2, ": No such file or directory\n", 28);
-	free_exit_exec(127, begin, begin_list, &PATH);
+	free_exit_exec(127, begin, &PATH);
 }
 
 int	ctrl_execution(int new_value)
@@ -504,7 +502,7 @@ void	canonical_mode(int set)
 		return ;
 }
 
-void	error_input(char *input, t_pipe_cmd *begin, t_command *begin_list)
+void	error_input(char *input, t_pipe_cmd *begin)
 {
 	write(2, "minishell: ", 11);
 	write(2, input, ft_strlen(input));
@@ -512,7 +510,7 @@ void	error_input(char *input, t_pipe_cmd *begin, t_command *begin_list)
 		write(2, ": Permission denied\n", 20);
 	else if (errno == ENOENT)
 		write(2, ": No such file or directory\n", 28);
-	free_exit_exec(1, begin, begin_list, NULL);
+	free_exit_exec(1, begin, NULL);
 }
 
 void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash, t_command *begin_list)
@@ -524,6 +522,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash, t_command *begin_list)
 	int			pid;
 	int			status;
 
+	(void)begin_list;
 	begin = pipe_cmd;
 	*backslash = 0;
 	firstcmd_pipes[0] = 1;
@@ -547,7 +546,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash, t_command *begin_list)
 			{
 				filefd[0] = open(pipe_cmd->input, O_RDONLY);
 				if (filefd[0] == -1)
-					error_input(pipe_cmd->input, begin, begin_list);
+					error_input(pipe_cmd->input, begin);
 				dup2(filefd[0], STDIN_FILENO);
 				close(filefd[0]);
 			}
@@ -575,13 +574,13 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash, t_command *begin_list)
 			if (is_builtin(pipe_cmd->cmd))
 				do_builtin(pipe_cmd->cmd, pid, firstcmd_pipes[1]);
 			else if (pid == 0)
-				launch_executable(pipe_cmd->cmd, begin, begin_list);
+				launch_executable(pipe_cmd->cmd, begin);
 		}
 		if (pid == 0)
-			free_exit_exec(exit_status(0, pid, 0), begin, begin_list, NULL);
+			free_exit_exec(exit_status(0, pid, 0), begin, NULL);
 		waitpid(pid, &status, 0);
 		if (exit_status(0, 0, 1))
-			free_exit_exec(exit_status(0, pid, 0), begin, begin_list, NULL);
+			free_exit_exec(exit_status(0, pid, 0), begin, NULL);
 		pipe_cmd = pipe_cmd->next;
 		firstcmd_pipes[0] = 0;
 	}
