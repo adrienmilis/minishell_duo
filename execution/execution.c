@@ -17,11 +17,8 @@ int	free_exit_exec(int status, t_pipe_cmd *pipe_cmd, t_command *begin_list, t_PA
 	free_pipe_cmd(pipe_cmd);
 	if (begin_list)
 		free_list(begin_list);
-	if (PATH)
-	{
-		free(PATH->value);
+	if (PATH && PATH->split)
 		free_strtab(PATH->split);
-	}
 	exit(status);
 }
 
