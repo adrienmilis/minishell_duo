@@ -11,10 +11,35 @@
 #include <string.h>
 #include <fcntl.h>*/
 
-int	ft_putchar(int c)
+int	free_exit_exec(int status, t_pipe_cmd *pipe_cmd, t_command *begin_list, t_PATH *PATH)
 {
-	write(1, &c, 1);
-	return (1);
+	free_strtab(myenv);
+	free_pipe_cmd(pipe_cmd);
+	if (begin_list)
+		free_list(begin_list);
+	if (PATH)
+	{
+		free(PATH->value);
+		free_strtab(PATH->split);
+	}
+	exit(status);
+}
+
+int	exit_status(int new_status, int pid, int check_main)
+{
+	static int	status;
+	static int	main_process;
+	int			ret;
+
+	if (check_main)
+		return (main_process);
+	if (pid)
+		main_process = 1;
+	else
+		main_process = 0;
+	ret = status;
+	status = new_status;
+	return (ret);
 }
 
 int	option_n(char *arg)
@@ -74,7 +99,7 @@ void	cd_pwd(void)
 
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
-		exit(0); //quel exit status ?
+		return ;
 	modif_env_var_value(myenv, "PWD", cwd);
 	free(cwd);
 }
@@ -101,7 +126,7 @@ int	builtin_cd(char **arg, int pid, int pipes)
 			}
 		}
 		else if (pid == 0 && chdir(*arg) < 0)
-			exit(1);
+			exit_status(1, pid, 0);
 	}
 	else
 		cd_oldpwd();
@@ -116,7 +141,7 @@ int	builtin_pwd(int pid)
 	{
 		pwd = getcwd(NULL, 0);
 		if (!pwd)
-			exit(0); //
+			return (1);
 		write(1, pwd, ft_strlen(pwd));
 		write(1, "\n", 1);
 		free(pwd);
@@ -193,7 +218,7 @@ int	builtin_export(char **arg, int pid, int pipes)
 	else if (pid == 0)
 		while (*(arg++))
 			if (!valid_env_name(*(arg - 1), 0))
-				exit(1);
+				exit_status(1, pid, 0);
 	return (1);
 }
 
@@ -220,7 +245,7 @@ int	builtin_unset(char **arg, int pid, int pipes)
 	else if (pid == 0)
 		while (*(arg++))
 			if (!valid_env_name(*(arg - 1), 1))
-				exit(1);
+				exit_status(1, pid, 0);
 	return (1);
 }
 
@@ -302,21 +327,21 @@ int	builtin_exit(char **arg, int pid, int pipes)
 				write(2, "minishell: exit: ", 17);
 				write(2, *arg, ft_strlen(*arg));
 				write(2, ": numeric argument required\n", 28);
-				exit(255);
+				exit_status(255, pid, 0);
 			}
 			else
 			{
 				if (*(arg + 1))
 					write(2, "minishell: exit: too many arguments\n", 36);
 				if (!*(arg + 1))
-					exit(ft_atoi(*arg));
+					exit_status(ft_atoi(*arg), pid, 0);
 			}
 		}
 		else
-			exit(ft_atoi(mygetenv(myenv, "?")));
+			exit_status(ft_atoi(mygetenv(myenv, "?")), pid, 0);
 	}
 	else if (pid == 0 && *arg && is_a_number(*arg) && *(arg + 1))
-		exit(1);
+		exit_status(1, pid, 0);
 	return (1);
 }
 
@@ -360,15 +385,15 @@ int	is_builtin(char **cmd)
 		return (0);
 }
 
-int	no_permission(char *cmd)
+void	no_permission(char *cmd, t_pipe_cmd *begin, t_command *begin_list, t_PATH *PATH)
 {
 	write(2, "minishell: ", 11);
 	write(2, cmd, ft_strlen(cmd));
 	write(2, ": Permission denied\n", 20);
-	exit(126);
+	free_exit_exec(126, begin, begin_list, PATH);
 }
 
-void	stat_check(char *cmd)
+void	stat_check(char *cmd, t_pipe_cmd *begin, t_command *begin_list, t_PATH *PATH)
 {
 	struct stat	buf;
 
@@ -379,62 +404,64 @@ void	stat_check(char *cmd)
 		write(2, "minishell: ", 11);
 		write(2, cmd, ft_strlen(cmd));
 		write(2, ": is a directory\n", 17);
-		exit(126);
+		free_exit_exec(126, begin, begin_list, PATH);
 	}
 	else if (S_ISREG(buf.st_mode) && ft_strchr(cmd, '/'))
 	{
 		if (!(buf.st_mode & S_IRUSR) || !(buf.st_mode & S_IXUSR))
-			no_permission(cmd);
+			no_permission(cmd, begin, begin_list, PATH);
 		else
-			exit(0);
+			free_exit_exec(0, begin, begin_list, PATH);
 	}
 }
 
-void	launch_executable(char **cmd)
+void	launch_executable(char **cmd, t_pipe_cmd *begin, t_command *begin_list)
 {
 	int		i;
 	char	*cmd0;
-	char	*PATH_value;
-	char	**PATH_split;
+	t_PATH	PATH;
 
 	if (!cmd[0])
 		return ;
-	PATH_value = mygetenv(myenv, "PATH");
-	PATH_split = NULL;
-	if (PATH_value && PATH_value[0])
+	PATH.value = mygetenv(myenv, "PATH");
+	PATH.split = NULL;
+	if (PATH.value && PATH.value[0])
 	{
-		PATH_split = ft_split(PATH_value, ':');
-		if (!PATH_split)
+		PATH.split = ft_split(PATH.value, ':');
+		if (!PATH.split)
+		{
+			free(PATH.value);
 			return ;
+		}
 	}
-	if (ft_strchr(cmd[0], '/') || !(PATH_value && PATH_value[0]))
+	if (ft_strchr(cmd[0], '/') || !(PATH.value && PATH.value[0]))
 		execve(cmd[0], cmd, myenv + 1);
 	if (errno == EACCES && ft_strchr(cmd[0], '/'))
-		stat_check(cmd[0]);
+		stat_check(cmd[0], begin, begin_list, &PATH);
 	cmd0 = cmd[0];
-	if (PATH_value && PATH_value[0] && PATH_split[0])
-		cmd[0] = ft_strjoin(PATH_split[0], cmd0, '/');
+	if (PATH.value && PATH.value[0] && PATH.split[0])
+		cmd[0] = ft_strjoin(PATH.split[0], cmd0, '/');
 	i = 1;
-	if (PATH_value && PATH_value[0])
+	if (PATH.value && PATH.value[0])
 	{
-		while (execve(cmd[0], cmd, myenv + 1) == -1 && PATH_split[i])
+		while (execve(cmd[0], cmd, myenv + 1) == -1 && PATH.split[i])
 		{
 			if (errno == EACCES && ft_strchr(cmd0, '/'))
-				no_permission(cmd0);
+				no_permission(cmd0, begin, begin_list, &PATH);
 			free(cmd[0]);
-			cmd[0] = ft_strjoin(PATH_split[i++], cmd0, '/');
+			cmd[0] = ft_strjoin(PATH.split[i++], cmd0, '/');
 		}
 		if (errno == EACCES && ft_strchr(cmd[0], '/'))
-			no_permission(cmd[0]);
+			no_permission(cmd[0], begin, begin_list, &PATH);
 	}
-	stat_check(cmd0);
+	stat_check(cmd0, begin, begin_list, &PATH);
 	write(2, "minishell: ", 11);
 	write(2, cmd0, ft_strlen(cmd0));
-	if (!ft_strchr(cmd0, '/') && PATH_value && PATH_value[0])
+	if (!ft_strchr(cmd0, '/') && PATH.value && PATH.value[0])
 		write(2, ": command not found\n", 20);
 	else
 		write(2, ": No such file or directory\n", 28);
-	exit(127);
+	free_exit_exec(127, begin, begin_list, &PATH);
 }
 
 int	ctrl_execution(int new_value)
@@ -480,7 +507,7 @@ void	canonical_mode(int set)
 		return ;
 }
 
-void	error_input(char *input)
+void	error_input(char *input, t_pipe_cmd *begin, t_command *begin_list)
 {
 	write(2, "minishell: ", 11);
 	write(2, input, ft_strlen(input));
@@ -488,17 +515,19 @@ void	error_input(char *input)
 		write(2, ": Permission denied\n", 20);
 	else if (errno == ENOENT)
 		write(2, ": No such file or directory\n", 28);
-	exit(1);
+	free_exit_exec(1, begin, begin_list, NULL);
 }
 
-void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
+void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash, t_command *begin_list)
 {
-	int	pipefd[2][2];
-	int	filefd[2];
-	int	firstcmd_pipes[2];
-	int	pid;
-	int	status;
+	t_pipe_cmd	*begin;
+	int			pipefd[2][2];
+	int			filefd[2];
+	int			firstcmd_pipes[2];
+	int			pid;
+	int			status;
 
+	begin = pipe_cmd;
 	*backslash = 0;
 	firstcmd_pipes[0] = 1;
 	firstcmd_pipes[1] = 0;
@@ -521,7 +550,7 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 			{
 				filefd[0] = open(pipe_cmd->input, O_RDONLY);
 				if (filefd[0] == -1)
-					error_input(pipe_cmd->input);
+					error_input(pipe_cmd->input, begin, begin_list);
 				dup2(filefd[0], STDIN_FILENO);
 				close(filefd[0]);
 			}
@@ -549,11 +578,13 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 			if (is_builtin(pipe_cmd->cmd))
 				do_builtin(pipe_cmd->cmd, pid, firstcmd_pipes[1]);
 			else if (pid == 0)
-				launch_executable(pipe_cmd->cmd);
+				launch_executable(pipe_cmd->cmd, begin, begin_list);
 		}
 		if (pid == 0)
-			exit(0);
+			free_exit_exec(exit_status(0, pid, 0), begin, begin_list, NULL);
 		waitpid(pid, &status, 0);
+		if (exit_status(0, 0, 1))
+			free_exit_exec(exit_status(0, pid, 0), begin, begin_list, NULL);
 		pipe_cmd = pipe_cmd->next;
 		firstcmd_pipes[0] = 0;
 	}
