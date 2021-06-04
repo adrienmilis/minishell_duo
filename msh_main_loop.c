@@ -98,7 +98,7 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
 	else if (rd[0] == 127 && ft_strlen(*buffer) > 0)
 		del_char_buffer(buffer, *begin_list);
 	else if (rd[0] == 4 && ft_strlen(*buffer) == 0)
-		error_free(*buffer, *begin_list, 0);
+		error_free(NULL, *begin_list, 0);
 	else if (rd[0] == 10)
 		reset = enter_event(buffer, begin_list, NULL, NULL);
 	return (ret);
