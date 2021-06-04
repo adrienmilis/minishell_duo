@@ -513,7 +513,7 @@ void	error_input(char *input, t_pipe_cmd *begin)
 	free_exit_exec(1, begin, NULL);
 }
 
-void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash, t_command *begin_list)
+void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 {
 	t_pipe_cmd	*begin;
 	int			pipefd[2][2];
@@ -522,7 +522,6 @@ void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash, t_command *begin_list)
 	int			pid;
 	int			status;
 
-	(void)begin_list;
 	begin = pipe_cmd;
 	*backslash = 0;
 	firstcmd_pipes[0] = 1;
