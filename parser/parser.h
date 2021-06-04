@@ -49,17 +49,16 @@ void		free_list(t_command	*begin_list);
 char		**free_strtab(char **strtab);
 
 // errors.c
+void		error_free_pars(char *buffer, t_command *b_lst, t_pipe_cmd *p_beg);
 void		set_exit_status(char *error, int status);
 void		free_pipe_elems(t_pipe_cmd *c);
 void		free_pipe_cmd(t_pipe_cmd *begin_list);
 
 // parse_out_quotes.c
-void		argument_w_spaces(char *word, int append, t_pars *p, t_package *s);
-char		*get_redir_word(t_pars *p, t_package *s, char *word, char *n_word);
-int			real_sign2(t_pars *p, char sign, t_package *s);
-int			real_sign(t_pars *p, t_package *s);
 int			reserved_chars(t_pars *p, t_package *s);
-int			must_append(int i, char *cmd, t_pars *p);
+void		argument_w_spaces(char *word, int append, t_pars *p, t_package *s);
+void		do_append(t_pars *p, t_package *s);
+void		do_add(t_pars *p, t_package *s);
 int			out_quotes(t_pars *p, t_package *s);
 
 // out_quotes_utils.c
@@ -73,23 +72,25 @@ char		*arg_double_quotes(t_pars *p, t_package *s);
 void		in_double_quotes(t_pars *p, t_package *s);
 
 // parser.c
+void		init_package(t_package *s, t_command *b_list, char *cmd);
 t_pipe_cmd	*parser(char *cmd, int new_command, t_command *b_list);
 
 // add_arguments.c
 void		add_argument2(char **new_args, char *word, t_pipe_cmd *last);
-int			append_arg(t_pipe_cmd *last, char *word, char *tmp);
 void		add_argument(char *word, t_package *s, char *word_to_free);
-char		*copy_next_word(t_pars *p, int word_size, t_package *s);
+int			append_arg(t_pipe_cmd *last, char *word, char *tmp);
+char		*copy_next_word(t_pars *p, int wd_size, t_package *s);
 char		*get_next_word(t_pars *p, t_package *s);
 
 // utils.c
-void		set_quotes(int i, char *cmd, t_pars *p);
 t_pipe_cmd	*init_pipe_list(void);
 void		init_pars_struct(t_pars *p, int new_command, char c);
 t_pipe_cmd	*reset_pars_struct(t_pars *p, t_package s);
+void		set_quotes(int i, char *cmd, t_pars *p);
 
 // check_syntax.c
 int			semicolons_valid(char *cmd);
+int			pipe_is_last_char(char *cmd, int i);
 int			pipes_valid(char *cmd);
 int			are_quotes_closed(char *cmd);
 int			check_syntax(char *cmd);
@@ -102,8 +103,8 @@ int			is_quote(char c);
 int			is_r_quote(char *c, int i);
 
 // check_chars2.c
-int			is_reserved_char(char c, int dollar);
 int			is_unesc_char(char *c, int i);
+int			is_reserved_char(char c, int dollar);
 int			is_number(char c);
 int			is_letter(char c);
 int			valid_var_char(char c);
@@ -121,26 +122,27 @@ t_pipe_cmd	*new_elem(void);
 void		print_list(t_pipe_cmd *begin_list);
 
 // libft.c
+void		free_in_join(char *s1, char *s2);
 char		*ft_strjoin_w_ns(char *s1, char *s2);
 char		*ft_strdup_len(char *str, int len);
-int			is_number(char c);
-int			is_letter(char c);
-int			valid_var_char(char c);
-int			ft_strcmp(char *s1, char *s2);
-
-// env.c
 char		*get_env_var(int index);
-
 // env_vars.c
-char		*gnw_double_quotes(t_pars *p, char *cmd, t_pipe_cmd *p_begin);
 char		*dup_dollar(t_package *s);
 char		*unvalid_var_name(t_pars *p, t_package *s, char *wrd, char *tmp_w);
 char		*valid_var_name(t_pars *p, t_package *s);
 char		*get_variable(t_pars *p, t_package *s);
 
 // simple_quotes.c
+void		append_simple(char *new_arg, t_package *s);
 char		*arg_simple_quotes(t_pars *p, t_package *s);
 void		in_simple_quotes(t_pars *p, t_package *s);
+
+// signs.c
+char		*get_redir_word(t_pars *p, t_package *s, char *word, char *new_w);
+int			real_greater_sign(char *word, t_pipe_cmd *last);
+int			real_smaller_sign(char *word, t_pipe_cmd *last);
+int			real_sign2(t_pars *p, char sign, t_package *s);
+int			real_sign(t_pars *p, t_package *s);
 
 // dupl_fcts.c
 char		*ft_strdup(char *str);

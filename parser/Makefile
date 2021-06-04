@@ -7,7 +7,6 @@ SRCS = parser.c \
 	check_chars.c \
 	check_syntax.c \
 	parse_out_quotes.c \
-	env.c \
 	env_vars.c \
 	simple_quotes.c \
 	check_chars2.c \
@@ -26,7 +25,6 @@ SRCS_PARS = parser.c \
 	check_chars.c \
 	check_syntax.c \
 	parse_out_quotes.c \
-	env.c \
 	env_vars.c \
 	simple_quotes.c \
 	check_chars2.c \
