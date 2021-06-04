@@ -34,7 +34,7 @@ typedef struct	s_PATH
 	char	**split;
 }				t_PATH;
 
-void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash, t_command *begin_list);
+void	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash);
 
 size_t	strlen_env_var(char *var);
 int		strcmp_env(const char *s1, const char *s2);
