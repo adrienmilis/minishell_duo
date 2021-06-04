@@ -33,7 +33,7 @@ void	c_option(char *argv2)
 	while (pipe_cmd)
 	{
 		if (pipe_cmd->cmd || pipe_cmd->input)
-			exec_pipe_cmd(pipe_cmd, &backslash, NULL);
+			exec_pipe_cmd(pipe_cmd, &backslash);
 		free_pipe_cmd(pipe_cmd);
 		pipe_cmd = parser(argv2, 0, NULL);
 	}
@@ -119,7 +119,7 @@ int	enter_event(char **buffer, t_command **begin_list)
 	while (pipe_cmd)
 	{
 		if (pipe_cmd->cmd || pipe_cmd->input)
-			exec_pipe_cmd(pipe_cmd, &backslash, *begin_list);	// free pipe_cmd on exit
+			exec_pipe_cmd(pipe_cmd, &backslash);	// free pipe_cmd on exit
 		free_pipe_cmd(pipe_cmd);
 		pipe_cmd = parser(*buffer, 0, *begin_list);
 	}
