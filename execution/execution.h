@@ -34,6 +34,14 @@ typedef struct	s_PATH
 	char	**split;
 }				t_PATH;
 
+typedef struct	s_exec_data
+{
+	int			firstcmd;
+	int			pipes;
+	int			pid;
+	int			status;
+}				t_exec_data;
+
 int	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash);
 
 size_t	strlen_env_var(char *var);

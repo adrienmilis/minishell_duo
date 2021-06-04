@@ -546,7 +546,7 @@ void	canonical_mode(int set)
 		return ;
 }
 
-void	error_input(char *input, t_pipe_cmd *begin, int pipefd[2][2], int *fst)
+void	error_input(char *input, t_pipe_cmd *begin, int pipefd[2][2], t_exec_data d)
 {
 	write(2, "minishell: ", 11);
 	write(2, input, ft_strlen(input));
@@ -554,7 +554,7 @@ void	error_input(char *input, t_pipe_cmd *begin, int pipefd[2][2], int *fst)
 		write(2, ": Permission denied\n", 20);
 	else if (errno == ENOENT)
 		write(2, ": No such file or directory\n", 28);
-	if (!fst[0])
+	if (!d.firstcmd)
 	{
 		close(pipefd[0][0]);
 		close(pipefd[0][1]);
@@ -564,99 +564,53 @@ void	error_input(char *input, t_pipe_cmd *begin, int pipefd[2][2], int *fst)
 	free_exit_exec(1, begin, NULL);
 }
 
-int	error_exec(t_pipe_cmd *beg, int pipefd[2][2], int *firstcmd_pipes, int pid)
+int	error_exec(t_pipe_cmd *beg, int pipefd[2][2], t_exec_data d)
 {
-	if (!firstcmd_pipes[0] && pid < 0)
+	if (!d.firstcmd && d.pid < 0)
 	{
 		close(pipefd[0][0]);
 		close(pipefd[0][1]);
 	}
-	if (pid == -1)
+	if (d.pid == -1)
 	{
 		close(pipefd[1][0]);
 		close(pipefd[1][1]);
 	}
-	else if (pid == 0)
+	else if (d.pid == 0)
 		free_exit_exec(0, beg, NULL);
 	return (0);
 }
 
-int	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
+int	redirections(t_pipe_cmd *pipe_cmd, t_pipe_cmd *begin, int fd[3][2], t_exec_data d)
 {
-	t_pipe_cmd	*begin;
-	int			fd[3][2];
-	int			firstcmd_pipes[2];
-	int			pid;
-	int			status;
-
-	begin = pipe_cmd;
-	*backslash = 0;
-	firstcmd_pipes[0] = 1;
-	firstcmd_pipes[1] = 0;
-	if (pipe_cmd->next)
-		firstcmd_pipes[1] = 1;
-	canonical_mode(1);
-	while (pipe_cmd && !ctrl_execution(1) && (pipe_cmd->cmd || pipe_cmd->input))
+	if (!d.firstcmd && !pipe_cmd->input)
+		dup2(fd[0][0], STDIN_FILENO);
+	else if (pipe_cmd->input)
 	{
-		fd[0][0] = fd[1][0];
-		fd[0][1] = fd[1][1];
-		if (pipe(fd[1]) == -1)
-			return (error_exec(begin, fd, firstcmd_pipes, -2));
-		signal(SIGINT, &handler_signal_execution);
-		signal(SIGQUIT, &handler_signal_execution);
-		pid = fork();
-		if (pid == -1)
-			return (error_exec(begin, fd, firstcmd_pipes, pid));
-		if (pid == 0)
-		{
-			if (!firstcmd_pipes[0] && !pipe_cmd->input)
-				dup2(fd[0][0], STDIN_FILENO);
-			else if (pipe_cmd->input)
-			{
-				fd[2][0] = open(pipe_cmd->input, O_RDONLY);
-				if (fd[2][0] == -1)
-					error_input(pipe_cmd->input, begin, fd, firstcmd_pipes);
-				dup2(fd[2][0], STDIN_FILENO);
-				close(fd[2][0]);
-			}
-			if (pipe_cmd->next && !pipe_cmd->output)
-				dup2(fd[1][1], STDOUT_FILENO);
-			else if (pipe_cmd->output)
-			{
-				if (!pipe_cmd->double_greater)
-					fd[2][1] = open(pipe_cmd->output, O_WRONLY | O_TRUNC);
-				else
-					fd[2][1] = open(pipe_cmd->output, O_WRONLY | O_APPEND);
-				dup2(fd[2][1], STDOUT_FILENO);
-				close(fd[2][1]);
-			}
-			close(fd[1][0]);
-			close(fd[1][1]);
-		}
-		if (!firstcmd_pipes[0])
-		{
-			close(fd[0][0]);
-			close(fd[0][1]);
-		}
-		if (pipe_cmd->cmd)
-		{
-			if (is_builtin(pipe_cmd->cmd))
-			{
-				if (!do_builtin(pipe_cmd->cmd, pid, firstcmd_pipes[1]))
-					return (error_exec(begin, fd, firstcmd_pipes, pid));
-			}
-			else if (pid == 0)
-				if (!launch_executable(pipe_cmd->cmd, begin))
-					return (error_exec(begin, fd, firstcmd_pipes, pid));
-		}
-		if (pid == 0)
-			free_exit_exec(exit_status(0, pid, 0), begin, NULL);
-		waitpid(pid, &status, 0);
-		if (exit_status(0, 0, 1))
-			free_exit_exec(exit_status(0, pid, 0), begin, NULL);
-		pipe_cmd = pipe_cmd->next;
-		firstcmd_pipes[0] = 0;
+		fd[2][0] = open(pipe_cmd->input, O_RDONLY);
+		if (fd[2][0] == -1)
+			error_input(pipe_cmd->input, begin, fd, d);
+		dup2(fd[2][0], STDIN_FILENO);
+		close(fd[2][0]);
 	}
+	if (pipe_cmd->next && !pipe_cmd->output)
+		dup2(fd[1][1], STDOUT_FILENO);
+	else if (pipe_cmd->output)
+	{
+		if (!pipe_cmd->double_greater)
+			fd[2][1] = open(pipe_cmd->output, O_WRONLY | O_TRUNC);
+		else
+			fd[2][1] = open(pipe_cmd->output, O_WRONLY | O_APPEND);
+		dup2(fd[2][1], STDOUT_FILENO);
+		close(fd[2][1]);
+	}
+	close(fd[1][0]);
+	close(fd[1][1]);
+	return (1);
+}
+
+int	end_execution(int *backslash, int fd[3][2], int status)
+{
 	if (WIFEXITED(status))
 	{
 		status = WEXITSTATUS(status);
@@ -677,4 +631,59 @@ int	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 	close(fd[1][1]);
 	canonical_mode(0);
 	return (1);
+}
+
+int	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
+{
+	t_pipe_cmd	*begin;
+	int			fd[3][2];
+	t_exec_data	d;
+
+	begin = pipe_cmd;
+	*backslash = 0;
+	d.firstcmd = 1;
+	d.pipes = 0;
+	d.pid = -2;
+	if (pipe_cmd->next)
+		d.pipes = 1;
+	canonical_mode(1);
+	while (pipe_cmd && !ctrl_execution(1) && (pipe_cmd->cmd || pipe_cmd->input))
+	{
+		fd[0][0] = fd[1][0];
+		fd[0][1] = fd[1][1];
+		if (pipe(fd[1]) == -1)
+			return (error_exec(begin, fd, d));
+		signal(SIGINT, &handler_signal_execution);
+		signal(SIGQUIT, &handler_signal_execution);
+		d.pid = fork();
+		if (d.pid == -1)
+			return (error_exec(begin, fd, d));
+		if (d.pid == 0)
+			if (!redirections(pipe_cmd, begin, fd, d))
+				return (0);
+		if (!d.firstcmd)
+		{
+			close(fd[0][0]);
+			close(fd[0][1]);
+		}
+		if (pipe_cmd->cmd)
+		{
+			if (is_builtin(pipe_cmd->cmd))
+			{
+				if (!do_builtin(pipe_cmd->cmd, d.pid, d.pipes))
+					return (error_exec(begin, fd, d));
+			}
+			else if (d.pid == 0)
+				if (!launch_executable(pipe_cmd->cmd, begin))
+					return (error_exec(begin, fd, d));
+		}
+		if (d.pid == 0)
+			free_exit_exec(exit_status(0, d.pid, 0), begin, NULL);
+		waitpid(d.pid, &d.status, 0);
+		if (exit_status(0, 0, 1))
+			free_exit_exec(exit_status(0, d.pid, 0), begin, NULL);
+		pipe_cmd = pipe_cmd->next;
+		d.firstcmd = 0;
+	}
+	return (end_execution(backslash, fd, d.status));
 }
