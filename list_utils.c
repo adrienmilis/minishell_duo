@@ -21,17 +21,13 @@ int	pointer_in_history(char *buffer, t_command *begin_list)
 t_command	*new_elem_history(char *str)
 {
 	t_command	*new_elem;
-	// char		*command;
 
 	new_elem = malloc(sizeof(t_command));
 	if (!new_elem)
 		return (NULL);
-	// command = ft_strdup(str);
-	// if (!command)
-	// 	return (NULL);
 	new_elem->next = NULL;
 	new_elem->prev = NULL;
-	new_elem->command = /*command*/str;
+	new_elem->command = str;
 	return (new_elem);
 }
 

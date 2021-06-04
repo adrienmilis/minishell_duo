@@ -2,7 +2,10 @@ NAME	=	minishell
 
 SRCS = new_megashell.c \
 		minishell_utils.c \
-		list_utils.c
+		list_utils.c \
+		minishell_utils2.c \
+		msh_misc.c \
+		msh_main_loop.c
 
 all:
 	make -C parser

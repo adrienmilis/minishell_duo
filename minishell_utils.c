@@ -1,36 +1,6 @@
 #include "msh.h"
 
-int	ft_isprint(int c)
-{
-	if (c >= ' ' && c < 127)
-		return (1);
-	return (0);
-}
-
-void	ft_putstr(char *str)
-{
-	int i;
-	int str_len;
-
-	if (str == NULL)
-		return ;
-	i = 0;
-	str_len = ft_strlen(str);
-	write(1, str, str_len);
-}
-
-void	error_free(char *buffer, t_command *begin_list)
-{
-	if (buffer)
-		free(buffer);
-	free_list(begin_list);
-	if (myenv)
-		free_strtab(myenv);
-	ft_putstr("minishell: fatal error\n");
-	exit(0);
-}
-
-int	init_termcap()
+int	init_termcap(void)
 {
 	int		ret;
 	char	*term_type;
@@ -44,37 +14,41 @@ int	init_termcap()
 	return (0);
 }
 
-int	shlvl()
+int	shlvl2(void)
 {
-	int		shlvl;
 	size_t	i;
+	int		shlvl;
 
+	i = 0;
+	while (strcmp_env(myenv[i], "SHLVL"))
+		i++;
+	shlvl = ft_atoi(mygetenv(myenv, "SHLVL")) + 1;
+	if (shlvl > 1000)
+	{
+		write(2, "minishell: warning: shell level (", 33);
+		ft_putnbr_fd(shlvl, 2);
+		write(2, ") too high, resetting to 1\n", 27);
+		shlvl = 1;
+	}
+	else if (shlvl < 0)
+		shlvl = 0;
+	free(myenv[i]);
+	myenv[i] = itoa_env_var("SHLVL=", shlvl);
+	if (!myenv[i])
+		return (0);
+	return (1);
+}
+
+int	shlvl(void)
+{
 	if (!var_is_in_env(myenv, "SHLVL"))
 	{
 		myenv = add_env_var_value(myenv, "SHLVL", "1");
 		if (!myenv)
-			return (0);	// free t_command, myenv;
+			return (0);
 	}
 	else
-	{
-		i = 0;
-		while (strcmp_env(myenv[i], "SHLVL"))
-			i++;
-		shlvl = ft_atoi(mygetenv(myenv, "SHLVL")) + 1; // proteger ft_atoi
-		if (shlvl > 1000)
-		{
-			write(2, "minishell: warning: shell level (", 33);
-			ft_putnbr_fd(shlvl, 2);
-			write(2, ") too high, resetting to 1\n", 27);
-			shlvl = 1;
-		}
-		else if (shlvl < 0)
-			shlvl = 0;
-		free(myenv[i]);
-		myenv[i] = itoa_env_var("SHLVL=", shlvl);
-		if (!myenv[i])
-			return (0); // free t_command, myenv
-	}
+		return (shlvl2());
 	return (1);
 }
 
@@ -118,7 +92,7 @@ void	del_char_buffer(char **buffer, t_command *begin_list)
 	i = 1;
 	new_buffer = malloc(ft_strlen(old_buf) * sizeof(char));
 	if (!new_buffer)
-		error_free(*buffer, begin_list);	// free t_command, myenv, buffer
+		error_free(*buffer, begin_list, 1);
 	while (old_buf[i])
 	{
 		new_buffer[i - 1] = old_buf[i - 1];
