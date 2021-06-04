@@ -258,11 +258,13 @@ int		modif_env_var(char **env, char *var)
 		{
 			free(env[i]);
 			env[i] = ft_strdup(var);
+			if (!env[i])
+				return (0);
 			return (1);
 		}
 		i++;
 	}
-	return (0);
+	return (1);
 }
 
 int		modif_env_var_value(char **env, char *varname, char *varvalue)
@@ -278,11 +280,13 @@ int		modif_env_var_value(char **env, char *varname, char *varvalue)
 		{
 			free(env[i]);
 			env[i] = ft_strjoin(varname, varvalue, '=');
+			if (!env[i])
+				return (0);
 			return (1);
 		}
 		i++;
 	}
-	return (0);
+	return (1);
 }
 
 char	*mygetenv(char **env, char *var)
