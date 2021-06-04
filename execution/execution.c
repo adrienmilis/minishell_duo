@@ -646,7 +646,7 @@ int	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 		status = WEXITSTATUS(status);
 		free(myenv[0]);
 		myenv[0] = itoa_env_var("?=", status);
-		if (myenv[0])
+		if (!myenv[0])
 			return (0);
 	}
 	if (ctrl_execution(1))
@@ -654,7 +654,7 @@ int	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
 		*backslash = 1;
 		free(myenv[0]);
 		myenv[0] = itoa_env_var("?=", ctrl_execution(0));
-		if (myenv[0])
+		if (!myenv[0])
 			return (0);
 	}
 	close(fd[1][0]);
