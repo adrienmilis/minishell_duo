@@ -635,6 +635,30 @@ int	end_execution(int *backslash, int fd[3][2], int status)
 	return (1);
 }
 
+int	exec_simple_cmd_2(t_pipe_cmd **pipe_cmd, t_pipe_cmd *begin, int fd[3][2], \
+		t_exec_data *d)
+{
+	if ((*pipe_cmd)->cmd)
+	{
+		if (is_builtin((*pipe_cmd)->cmd))
+		{
+			if (!do_builtin((*pipe_cmd)->cmd, d->pid, d->pipes))
+				return (error_exec(begin, fd, *d));
+		}
+		else if (d->pid == 0)
+			if (!launch_executable((*pipe_cmd)->cmd, begin))
+				return (error_exec(begin, fd, *d));
+	}
+	if (d->pid == 0)
+		free_exit_exec(exit_status(0, d->pid, 0), begin, NULL);
+	waitpid(d->pid, &d->status, 0);
+	if (exit_status(0, 0, 1))
+		free_exit_exec(exit_status(0, d->pid, 0), begin, NULL);
+	*pipe_cmd = (*pipe_cmd)->next;
+	d->firstcmd = 0;
+	return (1);
+}
+
 int	exec_simple_cmd(t_pipe_cmd **pipe_cmd, t_pipe_cmd *begin, int fd[3][2], \
 		t_exec_data *d)
 {
@@ -655,25 +679,7 @@ int	exec_simple_cmd(t_pipe_cmd **pipe_cmd, t_pipe_cmd *begin, int fd[3][2], \
 		close(fd[0][0]);
 		close(fd[0][1]);
 	}
-	if ((*pipe_cmd)->cmd)
-	{
-		if (is_builtin((*pipe_cmd)->cmd))
-		{
-			if (!do_builtin((*pipe_cmd)->cmd, d->pid, d->pipes))
-				return (error_exec(begin, fd, *d));
-		}
-		else if (d->pid == 0)
-			if (!launch_executable((*pipe_cmd)->cmd, begin))
-				return (error_exec(begin, fd, *d));
-	}
-	if (d->pid == 0)
-		free_exit_exec(exit_status(0, d->pid, 0), begin, NULL);
-	waitpid(d->pid, &d->status, 0);
-	if (exit_status(0, 0, 1))
-		free_exit_exec(exit_status(0, d->pid, 0), begin, NULL);
-	*pipe_cmd = (*pipe_cmd)->next;
-	d->firstcmd = 0;
-	return (1);
+	return (exec_simple_cmd_2(pipe_cmd, begin, fd, d));
 }
 
 int	exec_pipe_cmd(t_pipe_cmd *pipe_cmd, int *backslash)
