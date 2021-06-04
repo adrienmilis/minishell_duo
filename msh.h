@@ -7,17 +7,10 @@
 #include <string.h>
 #include "execution/execution.h"
 
-typedef struct s_command
-{
-	char				*command;
-	struct s_command	*prev;
-	struct s_command	*next;
-}				t_command;
-
 // parsing
 void		free_pipe_elems(t_pipe_cmd *c);
 void		free_pipe_cmd(t_pipe_cmd *begin_list);
-t_pipe_cmd	*parser(char *cmd, int new_command, char *buffer, t_command *b_list);	// ajouter a execution.h
+t_pipe_cmd	*parser(char *cmd, int new_command, t_command *b_list);	// ajouter a execution.h
 int			ft_putchar(int c);
 
 // minishell_utils.c

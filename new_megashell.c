@@ -29,13 +29,13 @@ void	c_option(char *argv2)
 	int			backslash;
 
 	backslash = 1;
-	pipe_cmd = parser(argv2, 1, NULL, NULL);
+	pipe_cmd = parser(argv2, 1, NULL);
 	while (pipe_cmd)
 	{
 		if (pipe_cmd->cmd || pipe_cmd->input)
-			exec_pipe_cmd(pipe_cmd, &backslash);
+			exec_pipe_cmd(pipe_cmd, &backslash, NULL);
 		free_pipe_cmd(pipe_cmd);
-		pipe_cmd = parser(argv2, 0, NULL, NULL);
+		pipe_cmd = parser(argv2, 0, NULL);
 	}
 	free_pipe_cmd(pipe_cmd);
 	int ret = ft_atoi(mygetenv(myenv, "?"));
@@ -108,7 +108,7 @@ int	enter_event(char **buffer, t_command **begin_list)
 
 	backslash = 0;
 	write(1, "\n", 1);
-	pipe_cmd = parser(*buffer, 1, *buffer, *begin_list);
+	pipe_cmd = parser(*buffer, 1, *begin_list);
 	if (pipe_cmd == NULL)
 	{
 		write(1, "megashell> ", 11);
@@ -119,9 +119,9 @@ int	enter_event(char **buffer, t_command **begin_list)
 	while (pipe_cmd)
 	{
 		if (pipe_cmd->cmd || pipe_cmd->input)
-			exec_pipe_cmd(pipe_cmd, &backslash);	// free pipe_cmd on exit
+			exec_pipe_cmd(pipe_cmd, &backslash, *begin_list);	// free pipe_cmd on exit
 		free_pipe_cmd(pipe_cmd);
-		pipe_cmd = parser(*buffer, 0, *buffer, *begin_list);
+		pipe_cmd = parser(*buffer, 0, *begin_list);
 	}
 	free_pipe_cmd(pipe_cmd);
 	new_elem = new_elem_history(*buffer);
