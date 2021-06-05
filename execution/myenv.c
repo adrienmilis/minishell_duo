@@ -51,8 +51,9 @@ char	**free_strtab(char **strtab)
 	size_t	i;
 
 	i = 0;
-	while (strtab[i])
-		free(strtab[i++]);
+	if (strtab)
+		while (strtab[i])
+			free(strtab[i++]);
 	free(strtab);
 	return (NULL);
 }
@@ -87,6 +88,7 @@ char	**copy_env(char **env)
 
 	res = malloc((strtablen(env) + 1) * sizeof(char *));
 	if (!res)
+
 		return (NULL);
 	i = 0;
 	while (env[i])
@@ -133,18 +135,23 @@ char	**add_env_var(char **env, char *var)
 
 	res = malloc((strtablen(env) + 2) * sizeof(char *));
 	if (!res)
-		return (NULL);
+		return (free_strtab(env));
 	i = 0;
 	while (env[i])
 	{
 		res[i] = ft_strdup(env[i]);
-		if (!res[i])
+		if (!res[i++])
+		{
+			free_strtab(env);
 			return (free_strtab(res));
-		i++;
+		}
 	}
 	res[i] = ft_strdup(var);
 	if (!res[i])
+	{
+		free_strtab(env);
 		return (free_strtab(res));
+	}
 	res[i + 1] = NULL;
 	free_strtab(env);
 	return (res);
@@ -157,18 +164,23 @@ char	**add_env_var_value(char **env, char *varname, char *varvalue)
 
 	res = malloc((strtablen(env) + 2) * sizeof(char *));
 	if (!res)
-		return (NULL);
+		return (free_strtab(env));
 	i = 0;
 	while (env[i])
 	{
 		res[i] = ft_strdup(env[i]);
-		if (!res[i])
+		if (!res[i++])
+		{
+			free_strtab(env);
 			return (free_strtab(res));
-		i++;
+		}
 	}
 	res[i] = ft_strjoin(varname, varvalue, '=');
 	if (!res[i])
+	{
+		free_strtab(env);
 		return (free_strtab(res));
+	}
 	res[i + 1] = NULL;
 	free_strtab(env);
 	return (res);
@@ -182,7 +194,7 @@ char	**rm_env_var(char **env, char *var)
 
 	res = malloc(strtablen(env) * sizeof(char *)); // + 1 ici pour etre sur de pas segfault ?
 	if (!res)
-		return (NULL);
+		return (free_strtab(env));
 	i = 0;
 	j = 0;
 	while (env[i])
@@ -190,9 +202,11 @@ char	**rm_env_var(char **env, char *var)
 		if (strcmp_env(env[i], var))
 		{
 			res[j] = ft_strdup(env[i]);
-			if (!res[j])
+			if (!res[j++])
+			{
+				free_strtab(env);
 				return (free_strtab(res));
-			j++;
+			}
 		}
 		i++;
 	}
