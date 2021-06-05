@@ -113,6 +113,8 @@ int	main(int argc, char **argv, char **env)
 	init_begin_list(&begin_list);
 	buffer = NULL;
 	myenv = new_env(env);
+	if (!myenv)
+		return (1);
 	if (!var_is_in_env(myenv, "PWD"))
 		first_pwd(begin_list);
 	if (!(shlvl()))
