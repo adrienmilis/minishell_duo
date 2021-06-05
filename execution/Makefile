@@ -14,7 +14,9 @@ SRCS		=	execution.c \
 				myenv_3.c \
 				myenv_4.c \
 				ft_split.c \
-				utils.c
+				utils_1.c \
+				utils_2.c \
+				utils_3.c
 
 OBJS		=	$(SRCS:.c=.o)
 

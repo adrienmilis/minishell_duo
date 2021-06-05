@@ -6,7 +6,7 @@
 /*   By: hmesnard <hmesnard@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:08:43 by hmesnard          #+#    #+#             */
-/*   Updated: 2021/06/02 19:48:15 by hmesnard         ###   ########.fr       */
+/*   Updated: 2021/06/05 12:46:50 by hmesnard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 static int	nb_mots(const char *str, char c)
 {
-	int i;
-	int nbmots;
+	int	i;
+	int	nbmots;
 
 	i = 0;
 	nbmots = 0;
@@ -31,9 +31,9 @@ static int	nb_mots(const char *str, char c)
 
 static int	malloc_mots(const char *str, char c, char **res)
 {
-	int i;
-	int mot;
-	int nblettres;
+	int	i;
+	int	mot;
+	int	nblettres;
 
 	i = 0;
 	mot = 0;
@@ -42,7 +42,8 @@ static int	malloc_mots(const char *str, char c, char **res)
 	{
 		if (str[i] == c)
 		{
-			if (!(res[mot] = malloc((nblettres + 1) * sizeof(char))))
+			res[mot] = malloc((nblettres + 1) * sizeof(char));
+			if (!res[mot])
 				return (0);
 			nblettres = 0;
 			mot++;
@@ -51,16 +52,17 @@ static int	malloc_mots(const char *str, char c, char **res)
 			nblettres++;
 		i++;
 	}
-	if (!(res[mot] = malloc((nblettres + 1) * sizeof(char))))
+	res[mot] = malloc((nblettres + 1) * sizeof(char));
+	if (!res[mot])
 		return (0);
 	return (1);
 }
 
 static void	fill_res(const char *str, char c, char **res)
 {
-	int i;
-	int mot;
-	int lettre;
+	int	i;
+	int	mot;
+	int	lettre;
 
 	i = 0;
 	mot = 0;
@@ -82,7 +84,7 @@ static void	fill_res(const char *str, char c, char **res)
 
 static void	free_res(char **res)
 {
-	int mot;
+	int	mot;
 
 	mot = 0;
 	while (res[mot])
@@ -90,7 +92,7 @@ static void	free_res(char **res)
 	free(res);
 }
 
-char		**ft_split(const char *str, char c)
+char	**ft_split(const char *str, char c)
 {
 	char	**res;
 	int		nb;
@@ -98,7 +100,8 @@ char		**ft_split(const char *str, char c)
 	if (!str)
 		return (NULL);
 	nb = nb_mots(str, c);
-	if (!(res = malloc((nb + 1) * sizeof(char*))))
+	res = malloc((nb + 1) * sizeof(char *));
+	if (!res)
 		return (NULL);
 	res[nb] = 0;
 	if (!malloc_mots(str, c, res))
