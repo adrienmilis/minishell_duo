@@ -1,15 +1,4 @@
 #include "execution.h"
-#include <stdio.h>
-/*#include <stdlib.h>
-#include <unistd.h>
-#include "../ft_split.c"
-#include "../ft_strjoin.c"
-#include <termios.h>
-#include <ctype.h>
-#include <curses.h>
-#include <term.h>
-#include <string.h>
-#include <fcntl.h>*/
 
 int	redirections(t_pipe_cmd *pipe_cmd, t_pipe_cmd *begin, int fd[3][2], \
 		t_exec_data d)
