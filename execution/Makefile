@@ -9,7 +9,10 @@ SRCS		=	execution.c \
 				builtin_export.c \
 				builtin_pwd_unset_env.c \
 				builtin_exit.c \
-				myenv.c \
+				myenv_1.c \
+				myenv_2.c \
+				myenv_3.c \
+				myenv_4.c \
 				ft_split.c \
 				utils.c
 
