@@ -12,7 +12,7 @@ size_t	strlen_env_var(char *var)
 	return (res);
 }
 
-int		strcmp_env(const char *s1, const char *s2)
+int	strcmp_env(const char *s1, const char *s2)
 {
 	size_t			i;
 	unsigned char	last_char_s1;
@@ -88,7 +88,6 @@ char	**copy_env(char **env)
 
 	res = malloc((strtablen(env) + 1) * sizeof(char *));
 	if (!res)
-
 		return (NULL);
 	i = 0;
 	while (env[i])
@@ -192,7 +191,7 @@ char	**rm_env_var(char **env, char *var)
 	size_t	i;
 	size_t	j;
 
-	res = malloc(strtablen(env) * sizeof(char *)); // + 1 ici pour etre sur de pas segfault ?
+	res = malloc((strtablen(env) + 1) * sizeof(char *));
 	if (!res)
 		return (free_strtab(env));
 	i = 0;
@@ -215,28 +214,28 @@ char	**rm_env_var(char **env, char *var)
 	return (res);
 }
 
-int		valid_env_name(char *var, int unset) //remplacer par ft_is* si on met la libft
+int	valid_env_name(char *var, int unset)
 {
 	size_t	i;
 
 	if (!var)
 		return (0);
 	if (!('A' <= var[0] && var[0] <= 'Z')
-			&& !('a' <= var[0] && var[0] <= 'z') && var[0] != '_')
+		&& !('a' <= var[0] && var[0] <= 'z') && var[0] != '_')
 		return (0);
 	i = 1;
 	while (var[i] && (var[i] != '=' || unset))
 	{
 		if (!('0' <= var[i] && var[i] <= '9')
-				&& !('A' <= var[i] && var[i] <= 'Z')
-				&& !('a' <= var[i] && var[i] <= 'z') && var[i] != '_')
+			&& !('A' <= var[i] && var[i] <= 'Z')
+			&& !('a' <= var[i] && var[i] <= 'z') && var[i] != '_')
 			return (0);
 		i++;
 	}
 	return (1);
 }
 
-int		var_is_in_env(char **env, char *var) // fusionner dans modif_env_var ? Probablement pas
+int	var_is_in_env(char **env, char *var)
 {
 	size_t	i;
 
@@ -252,14 +251,14 @@ int		var_is_in_env(char **env, char *var) // fusionner dans modif_env_var ? Prob
 	return (0);
 }
 
-int		var_has_value(char *var)
+int	var_has_value(char *var)
 {
 	if (var[strlen_env_var(var)] == '=')
 		return (1);
 	return (0);
 }
 
-int		modif_env_var(char **env, char *var)
+int	modif_env_var(char **env, char *var)
 {
 	size_t	i;
 
@@ -281,7 +280,7 @@ int		modif_env_var(char **env, char *var)
 	return (1);
 }
 
-int		modif_env_var_value(char **env, char *varname, char *varvalue)
+int	modif_env_var_value(char **env, char *varname, char *varvalue)
 {
 	size_t	i;
 
@@ -331,7 +330,7 @@ static int	nblen(unsigned int n)
 	return (1 + nblen(n / 10));
 }
 
-char		*itoa_env_var(char *prefix, int n)
+char	*itoa_env_var(char *prefix, int n)
 {
 	char			*res;
 	int				len;
