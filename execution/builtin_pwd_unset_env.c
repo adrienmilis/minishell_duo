@@ -22,10 +22,10 @@ int	builtin_unset_args(char **arg)
 	{
 		if (valid_env_name(*arg, 1))
 		{
-			if (var_is_in_env(myenv, *arg))
+			if (var_is_in_env(g_myenv, *arg))
 			{
-				myenv = rm_env_var(myenv, *arg);
-				if (!myenv)
+				g_myenv = rm_env_var(g_myenv, *arg);
+				if (!g_myenv)
 					return (0);
 			}
 		}
@@ -58,11 +58,11 @@ int	builtin_env(int pid)
 	if (pid == 0)
 	{
 		i = 1;
-		while (myenv[i])
+		while (g_myenv[i])
 		{
-			if (var_has_value(myenv[i]))
+			if (var_has_value(g_myenv[i]))
 			{
-				write(1, myenv[i], ft_strlen(myenv[i]));
+				write(1, g_myenv[i], ft_strlen(g_myenv[i]));
 				write(1, "\n", 1);
 			}
 			i++;

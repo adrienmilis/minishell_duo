@@ -5,8 +5,8 @@ void	error_free_pars(char *buffer, t_command *b_list, t_pipe_cmd *p_begin)
 	if (buffer)
 		free(buffer);
 	free_list(b_list);
-	if (myenv)
-		free_strtab(myenv);
+	if (g_myenv)
+		free_strtab(g_myenv);
 	free_pipe_cmd(p_begin);
 	ft_putstr("minishell: fatal error\n");
 	exit(0);
@@ -17,8 +17,8 @@ void	set_exit_status(char *error, int status)
 	ft_putstr("minishell: ");
 	ft_putstr(error);
 	ft_putstr("\n");
-	free(myenv[0]);
-	myenv[0] = itoa_env_var("?=", status);
+	free(g_myenv[0]);
+	g_myenv[0] = itoa_env_var("?=", status);
 }
 
 void	free_pipe_elems(t_pipe_cmd *c)

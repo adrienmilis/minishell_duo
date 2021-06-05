@@ -35,7 +35,7 @@ int	launch_executable_p(char **cmd, char *cmd0, t_PATH PATH, t_pipe_cmd *begin)
 	int	i;
 
 	i = 1;
-	while (execve(cmd[0], cmd, myenv + 1) == -1 && PATH.split[i])
+	while (execve(cmd[0], cmd, g_myenv + 1) == -1 && PATH.split[i])
 	{
 		if (errno == EACCES && ft_strchr(cmd0, '/'))
 			no_permission(cmd0, begin, &PATH);
@@ -52,7 +52,7 @@ int	launch_executable_p(char **cmd, char *cmd0, t_PATH PATH, t_pipe_cmd *begin)
 int	launch_executable_2(char **cmd, char *cmd0, t_PATH PATH, t_pipe_cmd *begin)
 {
 	if (ft_strchr(cmd[0], '/') || !(PATH.value && PATH.value[0]))
-		execve(cmd[0], cmd, myenv + 1);
+		execve(cmd[0], cmd, g_myenv + 1);
 	if (errno == EACCES && ft_strchr(cmd[0], '/'))
 		stat_check(cmd[0], begin, &PATH);
 	cmd0 = cmd[0];
@@ -83,7 +83,7 @@ int	launch_executable(char **cmd, t_pipe_cmd *begin)
 
 	if (!cmd[0])
 		return (0);
-	PATH.value = mygetenv(myenv, "PATH");
+	PATH.value = mygetenv(g_myenv, "PATH");
 	PATH.split = NULL;
 	if (PATH.value && PATH.value[0])
 	{

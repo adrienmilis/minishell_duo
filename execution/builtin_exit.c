@@ -69,7 +69,7 @@ int	builtin_exit(char **arg, int pid, int pipes)
 			}
 		}
 		else
-			exit_status(ft_atoi(mygetenv(myenv, "?")), pid, 0);
+			exit_status(ft_atoi(mygetenv(g_myenv, "?")), pid, 0);
 	}
 	else if (pid == 0 && *arg && is_a_number(*arg) && *(arg + 1))
 		exit_status(1, pid, 0);

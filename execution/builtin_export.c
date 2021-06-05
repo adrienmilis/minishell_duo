@@ -20,7 +20,7 @@ int	builtin_export_no_arg(void)
 	size_t	i;
 	size_t	env_var_len;
 
-	copy_myenv = copy_env(myenv + 1);
+	copy_myenv = copy_env(g_myenv + 1);
 	if (!copy_myenv)
 		return (0);
 	sort_env(copy_myenv);
@@ -33,7 +33,7 @@ int	builtin_export_no_arg(void)
 		if (var_has_value(copy_myenv[i]))
 		{
 			write(1, "=\"", 2);
-			export_print_env(mygetenv(myenv, copy_myenv[i]));
+			export_print_env(mygetenv(g_myenv, copy_myenv[i]));
 			write(1, "\"", 1);
 		}
 		write(1, "\n", 1);
@@ -49,15 +49,15 @@ int	builtin_export_args(char **arg)
 	{
 		if (valid_env_name(*arg, 0))
 		{
-			if (var_is_in_env(myenv, *arg))
+			if (var_is_in_env(g_myenv, *arg))
 			{
-				if (var_has_value(*arg) && !modif_env_var(myenv, *arg))
+				if (var_has_value(*arg) && !modif_env_var(g_myenv, *arg))
 					return (0);
 			}
 			else
 			{
-				myenv = add_env_var(myenv, *arg);
-				if (!myenv)
+				g_myenv = add_env_var(g_myenv, *arg);
+				if (!g_myenv)
 					return (0);
 			}
 		}

@@ -24,8 +24,8 @@ void	error_free(char *buffer, t_command *begin_list, int str)
 	if (buffer && !pointer_in_history(buffer, begin_list))
 		free(buffer);
 	free_list(begin_list);
-	if (myenv)
-		free_strtab(myenv);
+	if (g_myenv)
+		free_strtab(g_myenv);
 	if (str)
 		ft_putstr("minishell: fatal error\n");
 	else

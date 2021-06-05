@@ -2,8 +2,8 @@
 
 int	free_exit_exec(int status, t_pipe_cmd *pipe_cmd, t_PATH *PATH)
 {
-	if (myenv)
-		free_strtab(myenv);
+	if (g_myenv)
+		free_strtab(g_myenv);
 	free_pipe_cmd(pipe_cmd);
 	if (PATH && PATH->split)
 		free_strtab(PATH->split);

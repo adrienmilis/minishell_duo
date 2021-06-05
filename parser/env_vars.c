@@ -53,10 +53,10 @@ char	*valid_var_name(t_pars *p, t_package *s)
 	var_name = ft_strdup_len(s->cmd + start, p->i - start);
 	if (!var_name)
 		error_free_pars(s->cmd, s->b_list, s->p_begin);
-	while (myenv[j] && strcmp_env(var_name, myenv[j]))
+	while (g_myenv[j] && strcmp_env(var_name, g_myenv[j]))
 		j++;
 	free(var_name);
-	if (myenv[j] == 0)
+	if (g_myenv[j] == 0)
 		return (NULL);
 	var_value = get_env_var(j);
 	if (!var_value)

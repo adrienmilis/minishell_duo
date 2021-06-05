@@ -44,14 +44,15 @@ int	builtin_echo(char **arg, int pid)
 
 int	cd_oldpwd(void)
 {
-	if (!var_is_in_env(myenv, "OLDPWD"))
+	if (!var_is_in_env(g_myenv, "OLDPWD"))
 	{
-		myenv = add_env_var_value(myenv, "OLDPWD", mygetenv(myenv, "PWD"));
-		if (!myenv)
+		g_myenv = \
+			add_env_var_value(g_myenv, "OLDPWD", mygetenv(g_myenv, "PWD"));
+		if (!g_myenv)
 			return (0);
 	}
 	else
-		if (!modif_env_var_value(myenv, "OLDPWD", mygetenv(myenv, "PWD")))
+		if (!modif_env_var_value(g_myenv, "OLDPWD", mygetenv(g_myenv, "PWD")))
 			return (0);
 	return (1);
 }
@@ -63,7 +64,7 @@ int	cd_pwd(void)
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
 		return (0);
-	modif_env_var_value(myenv, "PWD", cwd);
+	modif_env_var_value(g_myenv, "PWD", cwd);
 	free(cwd);
 	return (1);
 }

@@ -15,8 +15,8 @@ void	c_option(char *argv2)	// remove
 		pipe_cmd = parser(argv2, 0, NULL);
 	}
 	free_pipe_cmd(pipe_cmd);
-	int ret = ft_atoi(mygetenv(myenv, "?"));
-	free_strtab(myenv);
+	int ret = ft_atoi(mygetenv(g_myenv, "?"));
+	free_strtab(g_myenv);
 	exit(ret);
 }
 
@@ -94,8 +94,8 @@ void	first_pwd(t_command *begin_list)
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
 		error_free(NULL, begin_list, 1);
-	myenv = add_env_var_value(myenv, "PWD", cwd);
-	if (!myenv)
+	g_myenv = add_env_var_value(g_myenv, "PWD", cwd);
+	if (!g_myenv)
 		error_free(NULL, begin_list, 1);
 	free(cwd);
 }
@@ -112,10 +112,10 @@ int	main(int argc, char **argv, char **env)
 		c = 1;	// remove
 	init_begin_list(&begin_list);
 	buffer = NULL;
-	myenv = new_env(env);
-	if (!myenv)
+	g_myenv = new_env(env);
+	if (!g_myenv)
 		return (1);
-	if (!var_is_in_env(myenv, "PWD"))
+	if (!var_is_in_env(g_myenv, "PWD"))
 		first_pwd(begin_list);
 	if (!(shlvl()))
 		error_free(buffer, begin_list, 1);

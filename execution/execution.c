@@ -45,17 +45,17 @@ int	end_execution(int *backslash, int fd[3][2], int status)
 	if (WIFEXITED(status))
 	{
 		status = WEXITSTATUS(status);
-		free(myenv[0]);
-		myenv[0] = itoa_env_var("?=", status);
-		if (!myenv[0])
+		free(g_myenv[0]);
+		g_myenv[0] = itoa_env_var("?=", status);
+		if (!g_myenv[0])
 			return (0);
 	}
 	if (ctrl_execution(1))
 	{
 		*backslash = 1;
-		free(myenv[0]);
-		myenv[0] = itoa_env_var("?=", ctrl_execution(0));
-		if (!myenv[0])
+		free(g_myenv[0]);
+		g_myenv[0] = itoa_env_var("?=", ctrl_execution(0));
+		if (!g_myenv[0])
 			return (0);
 	}
 	close(fd[1][0]);

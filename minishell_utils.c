@@ -20,9 +20,9 @@ int	shlvl2(void)
 	int		shlvl;
 
 	i = 0;
-	while (strcmp_env(myenv[i], "SHLVL"))
+	while (strcmp_env(g_myenv[i], "SHLVL"))
 		i++;
-	shlvl = ft_atoi(mygetenv(myenv, "SHLVL")) + 1;
+	shlvl = ft_atoi(mygetenv(g_myenv, "SHLVL")) + 1;
 	if (shlvl > 1000)
 	{
 		write(2, "minishell: warning: shell level (", 33);
@@ -32,19 +32,19 @@ int	shlvl2(void)
 	}
 	else if (shlvl < 0)
 		shlvl = 0;
-	free(myenv[i]);
-	myenv[i] = itoa_env_var("SHLVL=", shlvl);
-	if (!myenv[i])
+	free(g_myenv[i]);
+	g_myenv[i] = itoa_env_var("SHLVL=", shlvl);
+	if (!g_myenv[i])
 		return (0);
 	return (1);
 }
 
 int	shlvl(void)
 {
-	if (!var_is_in_env(myenv, "SHLVL"))
+	if (!var_is_in_env(g_myenv, "SHLVL"))
 	{
-		myenv = add_env_var_value(myenv, "SHLVL", "1");
-		if (!myenv)
+		g_myenv = add_env_var_value(g_myenv, "SHLVL", "1");
+		if (!g_myenv)
 			return (0);
 	}
 	else

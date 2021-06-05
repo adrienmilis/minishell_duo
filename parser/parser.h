@@ -6,7 +6,7 @@
 # include <stdlib.h>
 # include <fcntl.h>
 
-char	**myenv;
+char	**g_myenv;
 
 typedef struct s_pipe_cmd
 {
