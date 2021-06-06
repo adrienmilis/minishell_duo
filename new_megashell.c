@@ -37,7 +37,7 @@ void	write_hst_command(t_command *elem, char **b, int up, t_command *b_list)
 	}
 	if ((!up && elem) || (up && elem->command))
 	{
-		*b = elem->command;
+		*b = ft_strdup(elem->command);
 		ft_putstr(elem->command);
 	}
 	else

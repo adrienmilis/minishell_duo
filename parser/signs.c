@@ -68,7 +68,7 @@ int	real_sign2(t_pars *p, char sign, t_package *s)
 
 	last = ft_lstlast(s->p_begin);
 	word = get_redir_word(p, s, NULL, NULL);
-	if ((!word && p->var_not_exist) || (word && space_middle_of_word(word)
+	if ((!word && p->not_append) || (word && space_middle_of_word(word)
 			&& p->word_from_variable))
 	{
 		free(word);
