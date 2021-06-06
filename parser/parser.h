@@ -47,6 +47,8 @@ void		ft_putstr(char *str);
 void		error_free_pars(char *buffer, t_command *b_lst, t_pipe_cmd *p_beg);
 void		free_list(t_command	*begin_list);
 char		**free_strtab(char **strtab);
+char		*mygetenv(char **env, char *var);
+
 
 // errors.c
 void		error_free_pars(char *buffer, t_command *b_lst, t_pipe_cmd *p_beg);
@@ -85,7 +87,7 @@ char		*get_next_word(t_pars *p, t_package *s);
 // utils.c
 t_pipe_cmd	*init_pipe_list(void);
 void		init_pars_struct(t_pars *p, int new_command, char c);
-t_pipe_cmd	*reset_pars_struct(t_pars *p, t_package s);
+void		reset_pars_struct(t_pars *p);
 void		set_quotes(int i, char *cmd, t_pars *p);
 
 // check_syntax.c
@@ -129,7 +131,7 @@ char		*get_env_var(int index);
 // env_vars.c
 char		*dup_dollar(t_package *s);
 char		*unvalid_var_name(t_pars *p, t_package *s, char *wrd, char *tmp_w);
-char		*valid_var_name(t_pars *p, t_package *s);
+char		*valid_var_name(t_pars *p, t_package *s, char *var_name);
 char		*get_variable(t_pars *p, t_package *s);
 
 // simple_quotes.c

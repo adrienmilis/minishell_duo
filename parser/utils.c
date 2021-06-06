@@ -41,7 +41,7 @@ void	init_pars_struct(t_pars *p, int new_command, char c)
 	}
 }
 
-t_pipe_cmd	*reset_pars_struct(t_pars *p, t_package s)
+void	reset_pars_struct(t_pars *p)
 {
 	p->in_d_quotes = 0;
 	p->in_s_quotes = 0;
@@ -50,7 +50,6 @@ t_pipe_cmd	*reset_pars_struct(t_pars *p, t_package s)
 	p->word_from_variable = 0;
 	p->not_append = 0;
 	p->r = 0;
-	return (s.p_begin);
 }
 
 void	set_quotes(int i, char *cmd, t_pars *p)

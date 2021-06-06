@@ -39,13 +39,17 @@ char 	*unvalid_var_name(t_pars *p, t_package *s, char *word, char *tmp_word)
 	return (word);
 }
 
-char	*valid_var_name(t_pars *p, t_package *s)
+char	*valid_var_name(t_pars *p, t_package *s, char *var_name)
 {
-	char	*var_name;
 	int		start;
 	int		j;
 	char	*var_value;
 
+	if (s->cmd[p->i] == '?')
+	{
+		(p->i)++;
+		return (ft_strdup(mygetenv(g_myenv, "?")));
+	}
 	j = 0;
 	start = p->i;
 	while (valid_var_char(s->cmd[p->i]))
@@ -78,10 +82,10 @@ char	*get_variable(t_pars *p, t_package *s)
 		p->i += 1;
 		return (NULL);
 	}
-	if (!valid_var_char(s->cmd[p->i]))
+	if (!valid_var_char(s->cmd[p->i]) && s->cmd[p->i] != '?')
 		word = unvalid_var_name(p, s, NULL, NULL);
 	else
-		word = valid_var_name(p, s);
+		word = valid_var_name(p, s, NULL);
 	if (word == NULL && r_space)
 		p->not_append = 1;
 	return (word);

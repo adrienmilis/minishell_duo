@@ -12,6 +12,13 @@ void	init_package(t_package *s, t_command *b_list, char *cmd)
 	s->p_begin = p_begin;
 }
 
+void	*out_quotes_failed(t_pars *p, t_package s)
+{
+	free_pipe_cmd(s.p_begin);
+	reset_pars_struct(p);
+	return (NULL);
+}
+
 t_pipe_cmd	*parser(char *cmd, int new_command, t_command *b_list)
 {
 	t_package		s;
@@ -28,16 +35,13 @@ t_pipe_cmd	*parser(char *cmd, int new_command, t_command *b_list)
 		if (!p.in_d_quotes && !p.in_s_quotes)
 		{
 			if (!out_quotes(&p, &s))
-			{
-				free_pipe_cmd(s.p_begin);
-				reset_pars_struct(&p, s);
-				return (NULL);
-			}
+				return (out_quotes_failed(&p, s));
 		}
 		else if (p.in_s_quotes)
 			in_simple_quotes(&p, &s);
 		else
 			in_double_quotes(&p, &s);
 	}
-	return (reset_pars_struct(&p, s));
+	reset_pars_struct(&p);
+	return (s.p_begin);
 }

@@ -85,6 +85,11 @@ int	real_sign2(t_pars *p, char sign, t_package *s)
 		if (!(real_smaller_sign(word, last)))
 			return (0);
 	}
+	if (!word[0])
+	{
+		set_exit_status(": No such file or directory", 1);
+		return (0);
+	}
 	return (1);
 }
 

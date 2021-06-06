@@ -42,7 +42,7 @@ void		termcaps_del(void);
 
 // msh_main_loop.c
 void		updown_event(int *rst, char rd[3], t_command *beg_list, char **buffer);
-int			enter_event_null_cmd(char **buffer);
+int			enter_event_null_cmd(char **buffer, t_command **begin_list);
 int			enter_event(char **buffer, t_command **begin_list, t_command *new_elem, t_pipe_cmd	*pipe_cmd);
 void		print_and_add_char(char **buffer, char rd[4], t_command *begin_list);
 int			read_input(char **buffer, t_command **begin_list, int c, char *argv2);
