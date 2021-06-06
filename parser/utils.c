@@ -20,7 +20,7 @@ void	init_pars_struct(t_pars *p, int new_command, char c)
 	p->semicolon = 0;
 	p->prev_var_w_space = 0;
 	p->word_from_variable = 0;
-	p->var_not_exist = 0;
+	p->not_append = 0;
 	p->r = 0;
 	if (new_command)
 		p->i = 0;
@@ -48,7 +48,7 @@ t_pipe_cmd	*reset_pars_struct(t_pars *p, t_package s)
 	p->semicolon = 0;
 	p->prev_var_w_space = 0;
 	p->word_from_variable = 0;
-	p->var_not_exist = 0;
+	p->not_append = 0;
 	p->r = 0;
 	return (s.p_begin);
 }

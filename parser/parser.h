@@ -25,7 +25,7 @@ typedef struct s_pars
 	int	i;
 	int	prev_var_w_space;
 	int	word_from_variable;
-	int	var_not_exist;
+	int	not_append;
 	int	r;
 }				t_pars;
 
@@ -77,7 +77,7 @@ t_pipe_cmd	*parser(char *cmd, int new_command, t_command *b_list);
 
 // add_arguments.c
 void		add_argument2(char **new_args, char *word, t_pipe_cmd *last);
-void		add_argument(char *word, t_package *s, char *word_to_free);
+void		add_argument(char *word, t_package *s, char *word_to_free, t_pars *p);
 int			append_arg(t_pipe_cmd *last, char *word, char *tmp);
 char		*copy_next_word(t_pars *p, int wd_size, t_package *s);
 char		*get_next_word(t_pars *p, t_package *s);

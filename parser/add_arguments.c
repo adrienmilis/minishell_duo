@@ -21,7 +21,7 @@ void	add_argument2(char **new_args, char *word, t_pipe_cmd *last)
 	free(tmp);
 }
 
-void	add_argument(char *word, t_package *s, char *word_to_free)
+void	add_argument(char *word, t_package *s, char *word_to_free, t_pars *p)
 {
 	int			i;
 	char		**new_args;
@@ -42,6 +42,7 @@ void	add_argument(char *word, t_package *s, char *word_to_free)
 		error_free_pars(s->cmd, s->b_list, s->p_begin);
 	}
 	add_argument2(new_args, word, last);
+	p->not_append = 0;
 }
 
 int	append_arg(t_pipe_cmd *last, char *word, char *tmp)

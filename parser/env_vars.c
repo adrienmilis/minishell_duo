@@ -66,9 +66,10 @@ char	*valid_var_name(t_pars *p, t_package *s)
 
 char	*get_variable(t_pars *p, t_package *s)
 {
-	char		*word;
-	static int	r_space;
+	char	*word;
+	int		r_space;
 
+	r_space = 0;
 	if (is_r_space(&s->cmd[p->i - 1], p->i - 1))
 		r_space = 1;
 	p->i += 1;
@@ -82,8 +83,6 @@ char	*get_variable(t_pars *p, t_package *s)
 	else
 		word = valid_var_name(p, s);
 	if (word == NULL && r_space)
-		p->var_not_exist = 1;
-	if (word)
-		r_space = 0;
+		p->not_append = 1;
 	return (word);
 }

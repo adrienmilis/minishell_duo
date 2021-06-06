@@ -42,7 +42,7 @@ void	argument_w_spaces(char *word, int append, t_pars *p, t_package *s)
 			append = 0;
 		}
 		else
-			add_argument(new_word, s, word);
+			add_argument(new_word, s, word, p);
 		new_word = make_word(word, p, s);
 	}
 	free(word);
@@ -81,7 +81,7 @@ void	do_add(t_pars *p, t_package *s)
 		if (p->word_from_variable && space_in_word(word))
 			argument_w_spaces(word, 0, p, s);
 		else
-			add_argument(word, s, NULL);
+			add_argument(word, s, NULL, p);
 	}
 	p->word_from_variable = 0;
 }

@@ -30,6 +30,7 @@ t_pipe_cmd	*parser(char *cmd, int new_command, t_command *b_list)
 			if (!out_quotes(&p, &s))
 			{
 				free_pipe_cmd(s.p_begin);
+				reset_pars_struct(&p, s);
 				return (NULL);
 			}
 		}

@@ -2,11 +2,8 @@
 
 int	must_append(int i, char *cmd, t_pars *p)
 {
-	if (p->var_not_exist == 1)
-	{
-		p->var_not_exist = 0;
+	if (p->not_append == 1)
 		return (0);
-	}
 	if (p->prev_var_w_space == 1)
 	{
 		p->prev_var_w_space = 0;

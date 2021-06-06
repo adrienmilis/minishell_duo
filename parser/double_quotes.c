@@ -78,7 +78,7 @@ char	*arg_double_quotes(t_pars *p, t_package *s)
 		}
 	}
 	else
-		add_argument(new_arg, s, NULL);
+		add_argument(new_arg, s, NULL, p);
 	p->i += 1;
 	p->in_d_quotes = 0;
 	return (NULL);
@@ -89,7 +89,7 @@ void	in_double_quotes(t_pars *p, t_package *s)
 	if (s->cmd[p->i + 1] == '"')
 	{
 		if (!must_append(p->i, s->cmd, p))
-			add_argument(ft_strdup(""), s, NULL);
+			add_argument(ft_strdup(""), s, NULL, p);
 		p->i += 2;
 		p->in_d_quotes = 0;
 	}
