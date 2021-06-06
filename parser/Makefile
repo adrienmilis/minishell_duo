@@ -53,5 +53,11 @@ $(NAME): $(OBJS)
 clean:
 	rm -rf $(OBJS)
 
+fclean: clean
+	rm -rf $(NAME)
+
 pars: $(OBJS_PARS)
 	gcc $(FLAGS_PARS) $(OBJS_PARS) -o $(NAME_PARS)
+
+norm:
+	norminette $(SRCS) parser.h
