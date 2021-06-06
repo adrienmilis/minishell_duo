@@ -49,7 +49,6 @@ void		free_list(t_command	*begin_list);
 char		**free_strtab(char **strtab);
 char		*mygetenv(char **env, char *var);
 
-
 // errors.c
 void		error_free_pars(char *buffer, t_command *b_lst, t_pipe_cmd *p_beg);
 void		set_exit_status(char *error, int status);
@@ -66,6 +65,7 @@ int			out_quotes(t_pars *p, t_package *s);
 // out_quotes_utils.c
 int			must_append(int i, char *cmd, t_pars *p);
 char		*make_word(char	*word, t_pars *p, t_package *s);
+char		*get_redir_word(t_pars *p, t_package *s, char *word, char *new_w);
 
 // double_quotes.c
 void		doubleq_special(t_pars *p, char **buff, t_package *s);
@@ -79,7 +79,7 @@ t_pipe_cmd	*parser(char *cmd, int new_command, t_command *b_list);
 
 // add_arguments.c
 void		add_argument2(char **new_args, char *word, t_pipe_cmd *last);
-void		add_argument(char *word, t_package *s, char *word_to_free, t_pars *p);
+void		add_argument(char *wrd, t_package *s, char *wd_to_free, t_pars *p);
 int			append_arg(t_pipe_cmd *last, char *word, char *tmp);
 char		*copy_next_word(t_pars *p, int wd_size, t_package *s);
 char		*get_next_word(t_pars *p, t_package *s);
@@ -140,9 +140,9 @@ char		*arg_simple_quotes(t_pars *p, t_package *s);
 void		in_simple_quotes(t_pars *p, t_package *s);
 
 // signs.c
-char		*get_redir_word(t_pars *p, t_package *s, char *word, char *new_w);
 int			real_greater_sign(char *word, t_pipe_cmd *last);
 int			real_smaller_sign(char *word, t_pipe_cmd *last);
+int			do_sign(char sign, t_pipe_cmd *last, char *word);
 int			real_sign2(t_pars *p, char sign, t_package *s);
 int			real_sign(t_pars *p, t_package *s);
 

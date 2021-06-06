@@ -40,7 +40,6 @@ int	enter_event_null_cmd(char **buffer, t_command **begin_list)
 	}
 	*begin_list = *begin_list;
 	write(1, "megashell> ", 11);
-	// free(*buffer);
 	*buffer = NULL;
 	return (1);
 }

@@ -41,3 +41,31 @@ char	*make_word(char	*word, t_pars *p, t_package *s)
 	}
 	return (new_word);
 }
+
+char 	*get_redir_word(t_pars *p, t_package *s, char *word, char *new_word)
+{
+	while (is_space(s->cmd[p->i]))
+		p->i += 1;
+	p->r = 1;
+	if (s->cmd[p->i] == '\'')
+		word = arg_simple_quotes(p, s);
+	else if (s->cmd[p->i] == '"')
+		word = arg_double_quotes(p, s);
+	else
+		word = get_next_word(p, s);
+	while (!is_r_space(&s->cmd[p->i], p->i)
+		&& !is_r_resvd_char(&s->cmd[p->i], p->i, 0) && s->cmd[p->i])
+	{
+		if (s->cmd[p->i] == '\'')
+			word = ft_strjoin_w_ns(word, arg_simple_quotes(p, s));
+		else if (s->cmd[p->i] == '"')
+			word = ft_strjoin_w_ns(word, arg_double_quotes(p, s));
+		else
+		{
+			new_word = get_next_word(p, s);
+			word = ft_strjoin_w_ns(word, new_word);
+		}
+	}
+	p->r = 0;
+	return (word);
+}
