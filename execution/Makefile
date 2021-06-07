@@ -29,7 +29,7 @@ CFLAGS		=	-Wall -Wextra -Werror
 RM			=	rm -f
 
 .c.o:
-			$(CC) $(CFLAGS) -g3 -c $< -o $(<:.c=.o)
+			$(CC) $(CFLAGS) -c $< -o $(<:.c=.o)
 
 $(NAME):	$(OBJS)
 			ar rc $@ $^
@@ -45,3 +45,6 @@ fclean:		clean
 re:			fclean all
 
 .PHONY:		all clean fclean re
+
+norm:
+	norminette $(SRCS) execution.h
