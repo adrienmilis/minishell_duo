@@ -53,6 +53,7 @@ int		exit_status(int new_status, int pid, int check_main);
 int		ctrl_execution(int new_value);
 void	handler_signal_execution(int sig);
 void	canonical_mode(int set);
+void	dup2_and_close(int fd1, int fd2);
 
 int		launch_executable(char **cmd, t_pipe_cmd *begin);
 

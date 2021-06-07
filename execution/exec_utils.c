@@ -58,3 +58,9 @@ void	canonical_mode(int set)
 	if (tcsetattr(0, 0, &s_termios) == -1)
 		return ;
 }
+
+void	dup2_and_close(int fd1, int fd2)
+{
+	dup2(fd1, fd2);
+	close(fd1);
+}

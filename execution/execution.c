@@ -1,6 +1,6 @@
 #include "execution.h"
 
-int	redirections(t_pipe_cmd *pipe_cmd, t_pipe_cmd *begin, int fd[3][2], \
+void	redirections(t_pipe_cmd *pipe_cmd, t_pipe_cmd *begin, int fd[3][2], \
 		t_exec_data d)
 {
 	if (!d.firstcmd && !pipe_cmd->input)
@@ -10,8 +10,7 @@ int	redirections(t_pipe_cmd *pipe_cmd, t_pipe_cmd *begin, int fd[3][2], \
 		fd[2][0] = open(pipe_cmd->input, O_RDONLY);
 		if (fd[2][0] == -1)
 			error_input(pipe_cmd->input, begin, fd, d);
-		dup2(fd[2][0], STDIN_FILENO);
-		close(fd[2][0]);
+		dup2_and_close(fd[2][0], STDIN_FILENO);
 	}
 	if (pipe_cmd->next && !pipe_cmd->output)
 		dup2(fd[1][1], STDOUT_FILENO);
@@ -21,12 +20,11 @@ int	redirections(t_pipe_cmd *pipe_cmd, t_pipe_cmd *begin, int fd[3][2], \
 			fd[2][1] = open(pipe_cmd->output, O_WRONLY | O_TRUNC);
 		else
 			fd[2][1] = open(pipe_cmd->output, O_WRONLY | O_APPEND);
-		dup2(fd[2][1], STDOUT_FILENO);
-		close(fd[2][1]);
+		if (fd[2][1] >= 0)
+			dup2_and_close(fd[2][1], STDOUT_FILENO);
 	}
 	close(fd[1][0]);
 	close(fd[1][1]);
-	return (1);
 }
 
 int	end_execution(int *backslash, int fd[3][2], int status)
@@ -90,8 +88,7 @@ int	exec_simple_cmd(t_pipe_cmd **pipe_cmd, t_pipe_cmd *begin, int fd[3][2], \
 	if (d->pid == -1)
 		return (error_exec(begin, fd, *d));
 	if (d->pid == 0)
-		if (!redirections(*pipe_cmd, begin, fd, *d))
-			return (0);
+		redirections(*pipe_cmd, begin, fd, *d);
 	if (!d->firstcmd)
 	{
 		close(fd[0][0]);
