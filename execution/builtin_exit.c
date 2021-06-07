@@ -49,24 +49,23 @@ int	is_a_number(char *str)
 
 int	builtin_exit(char **arg, int pid, int pipes)
 {
+	if (pid != 0 && !pipes)
+		write(2, "exit\n", 5);
 	if ((pid != 0 && !pipes) || (pid == 0 && pipes))
 	{
-		if (*arg)
+		if (*arg && !is_a_number(*arg))
 		{
-			if (!is_a_number(*arg))
-			{
-				write(2, "minishell: exit: ", 17);
-				write(2, *arg, ft_strlen(*arg));
-				write(2, ": numeric argument required\n", 28);
-				exit_status(255, pid, 0);
-			}
-			else
-			{
-				if (*(arg + 1))
-					write(2, "minishell: exit: too many arguments\n", 36);
-				if (!*(arg + 1))
-					exit_status(ft_atoi(*arg), pid, 0);
-			}
+			write(2, "minishell: exit: ", 17);
+			write(2, *arg, ft_strlen(*arg));
+			write(2, ": numeric argument required\n", 28);
+			exit_status(255, pid, 0);
+		}
+		else if (*arg)
+		{
+			if (*(arg + 1))
+				write(2, "minishell: exit: too many arguments\n", 36);
+			if (!*(arg + 1))
+				exit_status(ft_atoi(*arg), pid, 0);
 		}
 		else
 			exit_status(ft_atoi(mygetenv(g_myenv, "?")), pid, 0);
