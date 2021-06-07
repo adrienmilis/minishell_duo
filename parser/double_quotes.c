@@ -36,6 +36,8 @@ char	*make_dquotes_arg(t_pars *p, t_package *s)
 	int		start;
 
 	buff = NULL;
+	if (s->cmd[p->i] == '"')
+		return (ft_strdup(""));
 	while (!(is_unesc_char(&s->cmd[p->i], p->i) && s->cmd[p->i] == '"'))
 	{
 		start = p->i;

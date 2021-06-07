@@ -1,25 +1,5 @@
 #include "msh.h"
 
-void	c_option(char *argv2)	// remove
-{
-	t_pipe_cmd	*pipe_cmd;
-	int			backslash;
-
-	backslash = 1;
-	pipe_cmd = parser(argv2, 1, NULL);
-	while (pipe_cmd)
-	{
-		if (pipe_cmd->cmd || pipe_cmd->input)
-			exec_pipe_cmd(pipe_cmd, &backslash);
-		free_pipe_cmd(pipe_cmd);
-		pipe_cmd = parser(argv2, 0, NULL);
-	}
-	free_pipe_cmd(pipe_cmd);
-	int ret = ft_atoi(mygetenv(g_myenv, "?"));
-	free_strtab(g_myenv);
-	exit(ret);
-}
-
 void	write_hst_command(t_command *elem, char **b, int up, t_command *b_list)
 {
 	int	len;
@@ -44,7 +24,7 @@ void	write_hst_command(t_command *elem, char **b, int up, t_command *b_list)
 		*b = NULL;
 }
 
-int	main2(char *buffer, t_command *begin_list, int c, char *argv2)
+int	main2(char *buffer, t_command *begin_list)
 {
 	struct termios	s_termios;
 	struct termios	s_termios_backup;
@@ -61,10 +41,9 @@ int	main2(char *buffer, t_command *begin_list, int c, char *argv2)
 		s_termios.c_lflag &= ~(ECHO);
 		if (tcsetattr(0, 0, &s_termios) == -1)
 			return (-1);
-		if (!c)
-			write(1, "megashell> ", 11);
+		write(1, "megashell> ", 11);
 		while (ret > 0)
-			ret = read_input(&buffer, &begin_list, c, argv2);
+			ret = read_input(&buffer, &begin_list);
 		if (tcsetattr(0, 0, &s_termios_backup) == -1)
 			return (-1);
 	}
@@ -104,12 +83,10 @@ int	main(int argc, char **argv, char **env)
 {
 	char		*buffer;
 	t_command	*begin_list;
-	int			c;
 	int			ret;
 
-	c = 0;	// remove
-	if (argc == 3 && argv[1][0] == '-' && argv[1][1] == 'c')	// remove
-		c = 1;	// remove
+	(void)argc;
+	(void)argv;
 	init_begin_list(&begin_list);
 	buffer = NULL;
 	g_myenv = new_env(env);
@@ -119,7 +96,7 @@ int	main(int argc, char **argv, char **env)
 		first_pwd(begin_list);
 	if (!(shlvl()))
 		error_free(buffer, begin_list, 1);
-	ret = main2(buffer, begin_list, c, argv[2]);
+	ret = main2(buffer, begin_list);
 	if (buffer)
 		free(buffer);
 	free_list(begin_list);

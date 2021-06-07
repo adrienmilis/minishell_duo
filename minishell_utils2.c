@@ -30,5 +30,11 @@ void	error_free(char *buffer, t_command *begin_list, int str)
 		ft_putstr("minishell: fatal error\n");
 	else
 		ft_putstr("exit\n");
-	exit(0);
+	exit(ft_atoi(mygetenv(g_myenv, "?")));
+}
+
+void	free_buf(char **buffer)
+{
+	free(*buffer);
+	*buffer = NULL;
 }

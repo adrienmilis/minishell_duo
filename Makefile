@@ -5,7 +5,7 @@ SRCS = new_megashell.c \
 		list_utils.c \
 		minishell_utils2.c \
 		msh_misc.c \
-		msh_main_loop.c \
+		msh_main_loop.c
 
 OBJS = $(SRCS:.c=.o)
 
@@ -20,13 +20,13 @@ $(NAME): $(OBJS)
 	make -C parser
 	make -C execution
 	$(CC) $(FLAGS) -lncurses parser/parser.a execution/execution.a $(OBJS) -o $(NAME)
-	make clean -C parser
-	make clean -C execution
 
 all: $(NAME)
 
 clean:
 	rm -rf $(OBJS)
+	make clean -C parser
+	make clean -C execution
 
 fclean: clean
 	rm -rf $(NAME)

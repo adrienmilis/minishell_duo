@@ -81,14 +81,11 @@ void	print_and_add_char(char **buffer, char rd[4], t_command *begin_list)
 		error_free(*buffer, begin_list, 1);
 }
 
-int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
+int	read_input(char **buffer, t_command **begin_list)
 {
 	char		rd[4];
 	int			ret;
 	static int	reset;
-
-	if (c)						// remove
-		c_option(argv2);
 
 	signal(SIGINT, &handler_sigint);
 	signal(SIGQUIT, &nothing_sigquit);
@@ -96,10 +93,7 @@ int	read_input(char **buffer, t_command **begin_list, int c, char *argv2)
 	if (ret == -1)
 		error_free(*buffer, *begin_list, 1);
 	if (ctrlC(0))
-	{
-		free(*buffer);
-		*buffer = NULL;
-	}
+		free_buf(buffer);
 	if (ft_isprint(rd[0]))
 		print_and_add_char(buffer, rd, *begin_list);
 	else if (rd[0] == '\033')
